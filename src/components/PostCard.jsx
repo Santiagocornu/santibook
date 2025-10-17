@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { auth } from "../db/firebase";
 import Swal from "sweetalert2";
 import { useDeletePost } from "../coostomhooks/useDeletePost";
+import EditPostModal from "./EditPostModal";
+import "../styles/PostCard.css";
+import { FiEdit, FiX } from "react-icons/fi"; // íconos
 
-const PostCard = ({ post, onEdit, onDelete }) => {
+const PostCard = ({ post, onDelete }) => {
   const currentUser = auth.currentUser;
   const { deletePost } = useDeletePost();
+  const [showEdit, setShowEdit] = useState(false);
+  const [postData, setPostData] = useState(post);
 
   const handleDelete = async () => {
     const result = await Swal.fire({
@@ -21,70 +26,56 @@ const PostCard = ({ post, onEdit, onDelete }) => {
 
     if (result.isConfirmed) {
       try {
-        await deletePost(post._id); 
+        await deletePost(postData._id);
         Swal.fire("¡Eliminado!", "El post ha sido eliminado.", "success");
-        if (onDelete) onDelete(); 
-      } catch (error) {}
+        if (onDelete) onDelete();
+      } catch (error) {
+        console.error("Error eliminando post:", error);
+      }
     }
   };
 
-  const handleEdit = () => {
-    if (onEdit) onEdit(post);
-  };
-
-  const isOwner = currentUser && currentUser.uid === post.uid;
+  const isOwner = currentUser && currentUser.uid === postData.uid;
 
   return (
-    <div
-      style={{
-        backgroundColor: "#8e6e53",
-        color: "white",
-        padding: "20px",
-        borderRadius: "15px",
-        marginBottom: "15px",
-        boxShadow: "0 0 8px rgba(0,0,0,0.2)",
-      }}
-    >
-      <p style={{ margin: "0 0 5px 0", fontWeight: "bold", color: "#f0e0d0", fontSize: "1rem" }}>
-        {post.displayName || "Usuario desconocido"}
-      </p>
-      <h2 style={{ margin: "0 0 10px 0" }}>{post.title}</h2>
-      <p style={{ margin: "0 0 10px 0" }}>{post.content}</p>
-      <p style={{ margin: 0, fontSize: "0.85rem", color: "#d3d3d3" }}>
-        {new Date(post.createdAt).toLocaleString()}
-      </p>
+    <>
+      <div className="post-card">
+        <p className="post-author">{postData.displayName || "Usuario desconocido"}</p>
+        <h2 className="post-title">{postData.title}</h2>
+        <p className="post-content">{postData.content}</p>
+        <p className="post-date">
+          {new Date(postData.createdAt).toLocaleString()}
+          {postData.editado && <span className="post-edited">editado</span>}
+        </p>
 
-      {isOwner && (
-        <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-          <button
-            onClick={handleEdit}
-            style={{
-              backgroundColor: "#f0e0d0",
-              color: "#8e6e53",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Editar
-          </button>
-          <button
-            onClick={handleDelete}
-            style={{
-              backgroundColor: "#d33",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Eliminar
-          </button>
-        </div>
+        {isOwner && (
+          <div className="post-actions">
+            <button
+              className="btn btn-vintage"
+              onClick={() => setShowEdit(true)}
+            >
+              <FiEdit style={{ marginRight: "5px" }} />
+              Editar
+            </button>
+            <button
+              className="btn btn-vintage"
+              onClick={handleDelete}
+            >
+              <FiX style={{ marginRight: "5px" }} />
+              Eliminar
+            </button>
+          </div>
+        )}
+      </div>
+
+      {showEdit && (
+        <EditPostModal
+          post={postData}
+          onClose={() => setShowEdit(false)}
+          onUpdated={(updatedPost) => setPostData(updatedPost)}
+        />
       )}
-    </div>
+    </>
   );
 };
 

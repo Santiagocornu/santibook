@@ -1,13 +1,12 @@
-// coostomhooks/useDeletePost.js
 import Swal from "sweetalert2";
 
 export const useDeletePost = () => {
   const deletePost = async (_id) => {
     try {
-      const res = await fetch(`/.netlify/functions/deletePost`, {
-        method: "POST", 
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: _id }), 
+      const idString = _id?.$oid || _id;
+
+      const res = await fetch(`/.netlify/functions/deletePost?id=${idString}`, {
+        method: "DELETE",
       });
 
       if (!res.ok) {

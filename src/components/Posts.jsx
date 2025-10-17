@@ -25,7 +25,6 @@ const Posts = ({ uid, searchTerm = "", filterBy = "todo" }) => {
   if (!filteredPosts.length) return <p>No hay publicaciones disponibles.</p>;
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h3>{uid ? "Publicaciones del usuario" : "Todas las publicaciones"}</h3>
       {filteredPosts.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}

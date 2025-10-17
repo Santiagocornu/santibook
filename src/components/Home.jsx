@@ -16,7 +16,7 @@ const Home = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showOpciones, setShowOpciones] = useState(false);
 
-  // 🔹 Nuevo estado: controla cuándo aplicar el filtro
+  
   const [appliedSearch, setAppliedSearch] = useState({
     term: "",
     filter: "todo",
@@ -43,7 +43,7 @@ const Home = () => {
   const handleLoginRedirect = () => navigate("/login");
   const showLogoutButton = user && !user.isAnonymous;
 
-  // 🔹 Solo aplica búsqueda al hacer click en la lupa
+ 
   const handleApplySearch = () => {
     setAppliedSearch({ term: searchTerm.trim(), filter: filterBy });
   };

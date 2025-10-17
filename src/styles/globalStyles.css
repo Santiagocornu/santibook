@@ -69,8 +69,10 @@ input:focus, select:focus {
   background-color: #8e6e53;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   gap: 10px;
+  box-sizing: border-box;
 }
 
+/* Secciones de navbar */
 .navbar-left,
 .navbar-center,
 .navbar-right {
@@ -79,26 +81,31 @@ input:focus, select:focus {
   justify-content: center;
 }
 
-/* Secciones de navbar */
+/* Left: avatar */
 .navbar-left {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: #ddd; /* Avatar futuro */
+  width: 60px;
+  flex-shrink: 0;
 }
 
+/* Center: search bar */
 .navbar-center {
   flex: 1;
   display: flex;
   justify-content: center;
-  gap: 10px;
 }
 
+/* Limitar ancho máximo de search bar */
+.navbar-center .search-bar {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Right: botones login/logout */
 .navbar-right {
-  width: auto;
+  width: 120px;
+  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -163,3 +170,4 @@ li {
   align-items: center;
   z-index: 1000;
 }
+
