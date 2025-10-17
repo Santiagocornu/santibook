@@ -1,0 +1,92 @@
+/* Contenedor del formulario */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Tarjeta del formulario */
+.form-card {
+  background-color: #8e6e53; /* marrón minimalista */
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 400px;
+  color: white;
+}
+
+/* Contenedor para los botones en línea */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Botones de estilo base */
+.btn {
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  color: white;
+  flex: 1; /* para que se alineen en la fila */
+}
+
+/* Botón Facebook */
+.btn-blue {
+  background-color: #1877f2;
+}
+.btn-blue:hover {
+  background-color: #3b83f7;
+  box-shadow: 0 0 12px rgba(24,119,242,0.7);
+  transform: scale(1.05);
+}
+
+/* Botón Google */
+.btn-red-google {
+  background-color: #db4437;
+}
+.btn-red-google:hover {
+  background-color: #e35c4b;
+  box-shadow: 0 0 12px rgba(219,68,55,0.7);
+  transform: scale(1.05);
+}
+
+/* Botón Crear cuenta Email */
+.btn-green {
+  background-color: #27ae60;
+}
+.btn-green:hover {
+  background-color: #2ecc71;
+  box-shadow: 0 0 12px rgba(46,204,113,0.7);
+  transform: scale(1.05);
+}
+
+/* Botón marrón: invitado */
+.btn-brown {
+  background-color: #8e6e53;
+}
+.btn-brown:hover {
+  background-color: #a5805f;
+  box-shadow: 0 0 12px rgba(165,128,95,0.7);
+  transform: scale(1.05);
+  color: white;
+}
+
+/* Botón rojo: cancelar */
+.btn-red {
+  background-color: #c0392b;
+}
+.btn-red:hover {
+  background-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.7);
+  transform: scale(1.05);
+}

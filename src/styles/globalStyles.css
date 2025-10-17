@@ -1,0 +1,164 @@
+/* Estilo base para todos los botones */
+.btn {
+  border: none;
+  border-radius: 9999px; 
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+  color: white;
+  background: transparent;
+}
+
+/* Botón rojo: eliminar / cancelar */
+.btn-red {
+  background-color: #c0392b;
+}
+.btn-red:hover {
+  background-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231, 76, 60, 0.7);
+  transform: scale(1.05);
+}
+
+/*  Botón verde: aceptar / guardar */
+.btn-green {
+  background-color: #27ae60;
+}
+.btn-green:hover {
+  background-color: #2ecc71;
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.7);
+  transform: scale(1.05);
+}
+
+/*  Botón marrón: acción normal */
+.btn-brown {
+  background-color: #8e6e53;
+}
+.btn-brown:hover {
+  background-color: #a5805f;
+  box-shadow: 0 0 12px rgba(165, 128, 95, 0.7);
+  transform: scale(1.05);
+}
+
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #2b1d16; /* fondo oscuro marrón */
+  color: #fff;
+}
+
+.form-card {
+  background-color: #8e6e53; /* marrón base */
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 320px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-card:hover {
+  transform: scale(1.01);
+}
+
+/* Campos de texto */
+input {
+  padding: 12px;
+  border-radius: 9999px;
+  border: 2px solid #000;
+  background-color: #f8f4f0;
+  color: #2b1d16;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:focus {
+  border-color: #5b3f2a;
+  box-shadow: 0 0 8px rgba(91, 63, 42, 0.8);
+}
+
+/* Botón pequeño para ver contraseña */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 35px; /* espacio para el botón */
+  border-radius: 9999px;
+  border: 2px solid #000;
+  background-color: #f8f4f0;
+  color: #2b1d16;
+  outline: none;
+}
+
+.btn-see {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px; 
+  padding: 0;
+  line-height: 1;
+  color: #2b1d16;
+}
+
+/* Navbar */
+.navbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #8e6e53; /* marrón como el formulario */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  gap: 10px;
+}
+
+/* Secciones dentro de la navbar */
+.navbar-left {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ddd; /* espacio para futura imagen del usuario */
+}
+
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Input blanco minimalista */
+.input-white {
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid #ccc;
+  outline: none;
+  background-color: white;
+  text-align: center;
+  font-size: 1rem;
+}
+
+
+
