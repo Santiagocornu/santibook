@@ -16,9 +16,7 @@ const LoginEmail = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Swal.fire("¡Éxito!", "Has iniciado sesión correctamente", "success").then(() => {
-        navigate("/"); 
-      });
+      navigate("/");
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }
@@ -38,8 +36,8 @@ const LoginEmail = () => {
           required
         />
 
-        {/* Contraseña con botón de mostrar */}
-        <div className="password-wrapper">
+        {/* Contraseña con botón dentro */}
+        <div className="password-input-container">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
@@ -49,15 +47,15 @@ const LoginEmail = () => {
           />
           <button
             type="button"
-            className="btn btn-see"
+            className="toggle-password"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? "🙈" : "👁️"}
           </button>
         </div>
 
-        {/* Botones: Iniciar sesión y Cancelar */}
-        <div className="btn-group">
+        {/* Botones lado a lado */}
+        <div className="btn-row-login">
           <button className="btn btn-green" type="submit">
             Iniciar sesión
           </button>

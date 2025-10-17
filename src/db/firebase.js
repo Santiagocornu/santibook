@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth,GoogleAuthProvider,FacebookAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, FacebookAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCiIySSjAxPFPaigTqZAogd89wzziHuOCM",
   authDomain: "santibook-25393.firebaseapp.com",
@@ -14,7 +15,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-//auth
+// Initialize Auth
 export const auth = getAuth(app);
+
+// Establecer persistencia local (mantiene sesión aunque cierres el navegador)
+setPersistence(auth, browserLocalPersistence)
+
+// Providers
 export const googleProvider = new GoogleAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();

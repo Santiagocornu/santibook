@@ -12,27 +12,34 @@ import { FaFacebookF, FaGoogle, FaEnvelope } from "react-icons/fa";
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
+  // Función genérica para login social y creación de user en Mongo
+  const handleSocialLogin = async (provider, providerName) => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      Swal.fire("¡Éxito!", "Has iniciado sesión con Google", "success").then(() => {
-        navigate("/"); 
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Crear usuario en MongoDB si no existe
+      await fetch("/.netlify/functions/addUser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          email: user.email || null,
+          displayName: user.displayName || null,
+          photoURL: user.photoURL || null,
+          type: "user",
+          createdAt: new Date(),
+        }),
       });
+
+      
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }
   };
 
-  const handleFacebookLogin = async () => {
-    try {
-      await signInWithPopup(auth, facebookProvider);
-      Swal.fire("¡Éxito!", "Has iniciado sesión con Facebook", "success").then(() => {
-        navigate("/"); 
-      });
-    } catch (error) {
-      Swal.fire("Error", error.message, "error");
-    }
-  };
+  const handleGoogleLogin = () => handleSocialLogin(googleProvider, "Google");
+  const handleFacebookLogin = () => handleSocialLogin(facebookProvider, "Facebook");
 
   const handleGuestLogin = async () => {
     try {

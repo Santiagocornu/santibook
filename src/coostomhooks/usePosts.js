@@ -1,25 +1,28 @@
-
 import { useState, useEffect } from 'react';
 
-export const usePosts = () => {
+export function usePosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/posts');
-        const data = await res.json();
-        setPosts(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setLoading(true);
+    const res = await fetch('/.netlify/functions/getPosts');
+    const data = await res.json();
+    setPosts(data);
+    setLoading(false);
+  };
 
+  const addPost = async (title, content) => {
+    await fetch('/.netlify/functions/addPost', {
+      method: 'POST',
+      body: JSON.stringify({ title, content }),
+    });
+    fetchPosts(); 
+  };
+
+  useEffect(() => {
     fetchPosts();
   }, []);
 
-  return { posts, loading };
-};
+  return { posts, loading, addPost };
+}

@@ -3,21 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../db/firebase";
 import { signOut } from "firebase/auth";
 import Swal from "sweetalert2";
-import "../styles/globalStyles.css";
-import "../styles/LoginStyles.css";
+import "../styles/HomeStyles.css";
+import Posts from "./Posts";
+import CreatePost from "./CreatePost";
+import OpcionesPerfil from "./OpcionesPerfil";
 
 const Home = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterBy, setFilterBy] = useState("todo");
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [showOpciones, setShowOpciones] = useState(false);
 
-  const items = ["Manzana", "Banana", "Naranja", "Pera", "Sandía", "Mango"];
-  const filteredItems = items.filter(item =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 🔹 Nuevo estado: controla cuándo aplicar el filtro
+  const [appliedSearch, setAppliedSearch] = useState({
+    term: "",
+    filter: "todo",
+  });
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(currentUser => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
     });
     return () => unsubscribe();
@@ -37,54 +43,110 @@ const Home = () => {
   const handleLoginRedirect = () => navigate("/login");
   const showLogoutButton = user && !user.isAnonymous;
 
+  // 🔹 Solo aplica búsqueda al hacer click en la lupa
+  const handleApplySearch = () => {
+    setAppliedSearch({ term: searchTerm.trim(), filter: filterBy });
+  };
+
   return (
     <div>
-      {/* Mini Navbar */}
+      {/* Navbar */}
       <nav className="navbar">
-  {/* Izquierda: avatar */}
-  <div className="navbar-left">
-    {/* futura imagen de usuario */}
-  </div>
+        <div className="navbar-left">
+          {user && !user.isAnonymous && (
+            <img
+              src={
+                user.photoURL ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }
+              alt="perfil"
+              className="profile-img"
+              onClick={() => setShowOpciones(true)}
+            />
+          )}
+        </div>
 
-  {/* Centro: buscador */}
-  <div className="navbar-center">
-    <input
-      type="text"
-      placeholder="Buscar..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="input-white"
-    />
-  </div>
+        <div className="navbar-center">
+          <div className="search-bar">
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              className="search-filter"
+            >
+              <option value="todo">Todo</option>
+              <option value="posts">Posts</option>
+              <option value="cuentas">Cuentas</option>
+            </select>
 
-  {/* Derecha: botón login/logout */}
-  <div className="navbar-right">
-    {showLogoutButton ? (
-      <button onClick={handleLogout} className="btn btn-red">
-        Cerrar Sesión
-      </button>
-    ) : (
-      <button onClick={handleLoginRedirect} className="btn btn-green">
-        Iniciar Sesión
-      </button>
-    )}
-  </div>
-</nav>
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
 
+            <button className="search-btn" onClick={handleApplySearch}>
+              🔍
+            </button>
+          </div>
+        </div>
+
+        <div className="navbar-right">
+          {showLogoutButton ? (
+            <button onClick={handleLogout} className="btn btn-red">
+              Cerrar Sesión
+            </button>
+          ) : (
+            <button onClick={handleLoginRedirect} className="btn btn-green">
+              Iniciar Sesión
+            </button>
+          )}
+        </div>
+      </nav>
 
       {/* Contenido */}
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        {user && !user.isAnonymous && <p>Bienvenido {user.email}</p>}
+      <div className="home-welcome">
+        {user && !user.isAnonymous && (
+          <p>
+            Bienvenido{" "}
+            <strong>{user.displayName || user.email || "Usuario"}</strong>
+          </p>
+        )}
         {user && user.isAnonymous && <p>Bienvenido invitado</p>}
-
-        <ul style={{ marginTop: "20px", listStyle: "none", padding: 0 }}>
-          {filteredItems.map((item, index) => (
-            <li key={index} style={{ margin: "5px 0" }}>
-              {item}
-            </li>
-          ))}
-        </ul>
       </div>
+
+      {/* 🔹 Ahora usa Posts con los filtros aplicados */}
+      <Posts
+        searchTerm={appliedSearch.term}
+        filterBy={appliedSearch.filter}
+      />
+
+      {/* Modal de crear post */}
+      {showCreatePost && (
+        <div className="modal-overlay" onClick={() => setShowCreatePost(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <CreatePost onPostCreated={() => setShowCreatePost(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Modal lateral de opciones */}
+      {showOpciones && (
+        <div className="side-overlay" onClick={() => setShowOpciones(false)}>
+          <div className="side-panel" onClick={(e) => e.stopPropagation()}>
+            <OpcionesPerfil onClose={() => setShowOpciones(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Botón flotante */}
+      <button
+        onClick={() => setShowCreatePost(true)}
+        className="floating-btn btn btn-brown"
+      >
+        +
+      </button>
     </div>
   );
 };
