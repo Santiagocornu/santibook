@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { usePosts } from "../coostomhooks/usePosts";
 import PostCard from "./PostCard";
 import "../styles/globalStyles.css"; // spinner y estilos globales
