@@ -1,38 +1,136 @@
+/* ================== Contenedor principal ================== */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #5b3f2a;
+  font-family: 'Arial', sans-serif;
+}
+
+/* ================== Tarjeta del formulario ================== */
+.form-card {
+  background-color: #a67c52;
+  padding: 30px 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 360px;
+  text-align: center;
+  /* Eliminado hover en el contenedor */
+}
+
+/* ================== Inputs ================== */
+.input-white {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #d4c4a8;
+  font-size: 1rem;
+  outline: none;
+  background-color: #fdfaf5;
+  transition: border 0.3s, box-shadow 0.3s;
+  resize: none;
+  color: #5b3f2a;
+  text-align: center;
+}
+
+.input-white:focus {
+  border-color: #a67c52;
+  box-shadow: 0 0 8px rgba(166, 124, 82, 0.4);
+}
+
+/* ================== Contador de caracteres ================== */
+.char-counter {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #e8dcc0;
+  margin-bottom: 10px;
+}
+
+/* ================== Botones ================== */
+.btn {
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Colores de botones */
+.btn-red {
+  background-color: #c0392b;
+}
+.btn-red:hover {
+  background-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.7);
+  transform: scale(1.05);
+}
+
+.btn-green {
+  background-color: #27ae60;
+}
+.btn-green:hover {
+  background-color: #2ecc71;
+  box-shadow: 0 0 12px rgba(46,204,113,0.7);
+  transform: scale(1.05);
+}
+
+/* Contenedor de botones final */
+.btn-row-end {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* ================== Tarjetas de Posts ================== */
 .post-card {
-  background-color: #8e6e53;
+  background-color: #a67c52;
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
-  margin-bottom: 20px; /* gap entre tarjetas */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin: 0 auto 20px auto;
+  max-width: 400px;
+  text-align: center; /* centra todo dentro */
+  /* sin hover en la tarjeta */
+}
+
+.post-author,
+.post-title,
+.post-content,
+.post-date {
+  text-align: center;
 }
 
 .post-author {
   margin: 0 0 5px 0;
   font-weight: bold;
-  color: #f0e0d0;
+  color: #f5f0e8;
   font-size: 1rem;
-  text-align: center;
 }
 
-.post-title {
-  margin: 0 0 10px 0;
-  text-align: center;
-}
-
+.post-title,
 .post-content {
   margin: 0 0 10px 0;
-  text-align: center;
+  color: #fdfaf5;
 }
 
 .post-date {
   margin: 0;
   font-size: 0.85rem;
-  color: #d3d3d3;
-  text-align: center;
+  color: #e8dcc0;
 }
 
 .post-edited {
-  color: #aaa;
+  color: #c4b89a;
   margin-left: 10px;
 }
 
@@ -40,82 +138,58 @@
   margin-top: 10px;
   display: flex;
   justify-content: center;
-  gap: 8px; /* separación entre botones */
+  gap: 10px;
 }
 
 .post-actions .btn {
-  padding: 3px 8px; /* botones pequeños */
+  padding: 5px 12px;
   font-size: 0.85rem;
 }
 
-.comment-btn {
-  cursor: default;
-}
-
-.comment-btn:hover {
-  /* sin hover */
-  background-color: inherit;
-  box-shadow: none;
-  transform: none;
-}
-
-/* Botones vintage cuadrados sobresalientes */
+/* ================== Botones vintage cuadrados sobresalientes ================== */
 .btn-vintage {
-  background-color: #fff8e7;
-  color: #8e6e53;
-  border: 2px solid #8e6e53;
-  border-radius: 5px; /* cuadrados */
+  background-color: #fdfaf5;
+  color: #a67c52;
+  border: 2px solid #a67c52;
+  border-radius: 5px;
   padding: 5px 12px;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 4px;
   cursor: pointer;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.3); /* sobresalientes */
-  transition: all 0.2s ease-in-out;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+  transition: all 0.3s ease-in-out;
 }
 
 .btn-vintage:hover {
   background-color: #f0e0d0;
-  color: #8e6e53;
+  color: #a67c52;
   transform: translateY(-2px);
   box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
 }
 
-/* Mantener el gap entre botones y tarjetas */
-.post-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.input-white {
-  width: 100%;
+/* Textarea para post */
+.textarea-post {
+  width: 100%;          
+  max-width: 100%;     
   padding: 12px;
   border-radius: 12px;
-  border: 2px solid #ccc;
+  border: 2px solid #d4c4a8;
   font-size: 1rem;
   outline: none;
-  background-color: white;
-  transition: border 0.2s, box-shadow 0.2s;
+  background-color: #fdfaf5;
   resize: none;
+  color: #5b3f2a;
+  height: 120px;
+  box-sizing: border-box;
+  text-align: center;   
+  margin: 0 auto;       
+  transition: border 0.3s, box-shadow 0.3s;
 }
 
-.input-white:focus {
-  border-color: #5b3f2a;
-  box-shadow: 0 0 8px rgba(91,63,42,0.4);
-}
 
-.char-counter {
-  text-align: right;
-  font-size: 0.85rem;
-  color: #d3d3d3;
-  margin-bottom: 10px;
-}
-
-.btn-row-end {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+.textarea-post:focus {
+  border-color: #a67c52;
+  box-shadow: 0 0 8px rgba(166, 124, 82, 0.4);
 }

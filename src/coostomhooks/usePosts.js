@@ -3,26 +3,41 @@ import { useState, useEffect } from 'react';
 export function usePosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Agregado estado para errores
 
   const fetchPosts = async () => {
     setLoading(true);
-    const res = await fetch('/.netlify/functions/getPosts');
-    const data = await res.json();
-    setPosts(data);
-    setLoading(false);
+    setError(null); // Resetear error antes de fetch
+    try {
+      const res = await fetch('/.netlify/functions/getPosts');
+      if (!res.ok) {
+        throw new Error('Error al obtener posts');
+      }
+      const data = await res.json();
+      setPosts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addPost = async (title, content) => {
-    await fetch('/.netlify/functions/addPost', {
-      method: 'POST',
-      body: JSON.stringify({ title, content }),
-    });
-    fetchPosts(); 
+    try {
+      await fetch('/.netlify/functions/addPost', {
+        method: 'POST',
+        body: JSON.stringify({ title, content }),
+      });
+      fetchPosts(); 
+    } catch (err) {
+      setError('Error al añadir post');
+    }
   };
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
-  return { posts, loading, addPost };
+  
+  return { posts, loading, error, addPost, refetch: fetchPosts };
 }

@@ -7,6 +7,7 @@ import "../styles/HomeStyles.css";
 import Posts from "./Posts";
 import CreatePost from "./CreatePost";
 import OpcionesPerfil from "./OpcionesPerfil";
+import { usePosts } from "../coostomhooks/usePosts";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -15,12 +16,10 @@ const Home = () => {
   const [filterBy, setFilterBy] = useState("todo");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showOpciones, setShowOpciones] = useState(false);
+  const [appliedSearch, setAppliedSearch] = useState({ term: "", filter: "todo" });
 
-  
-  const [appliedSearch, setAppliedSearch] = useState({
-    term: "",
-    filter: "todo",
-  });
+  // **Estado centralizado de posts desde el hook**
+  const { posts: fetchedPosts, loading, error, refetch } = usePosts();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -43,22 +42,24 @@ const Home = () => {
   const handleLoginRedirect = () => navigate("/login");
   const showLogoutButton = user && !user.isAnonymous;
 
- 
   const handleApplySearch = () => {
     setAppliedSearch({ term: searchTerm.trim(), filter: filterBy });
   };
 
+  const handleReloadPosts = async () => {
+    if (refetch) {
+      await refetch(); 
+    }
+  };
+
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-left">
           {user && !user.isAnonymous && (
             <img
-              src={
-                user.photoURL ||
-                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-              }
+              src={user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
               alt="perfil"
               className="profile-img"
               onClick={() => setShowOpciones(true)}
@@ -71,7 +72,7 @@ const Home = () => {
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value)}
-              className="search-filter"
+              className="search-select"
             >
               <option value="todo">Todo</option>
               <option value="posts">Posts</option>
@@ -86,7 +87,11 @@ const Home = () => {
               className="search-input"
             />
 
-            <button className="search-btn" onClick={handleApplySearch}>
+            <button
+              type="button"
+              className="search-btn btn btn-brown"
+              onClick={handleApplySearch}
+            >
               🔍
             </button>
           </div>
@@ -105,7 +110,7 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* Contenido */}
+      {/* Mensaje de bienvenida */}
       <div className="home-welcome">
         {user && !user.isAnonymous && (
           <p>
@@ -116,37 +121,40 @@ const Home = () => {
         {user && user.isAnonymous && <p>Bienvenido invitado</p>}
       </div>
 
-      {/* 🔹 Ahora usa Posts con los filtros aplicados */}
+      {/* Posts filtrados, ahora reciben los posts directamente desde el hook */}
       <Posts
+        posts={fetchedPosts}  
+        loading={loading}
+        error={error}
         searchTerm={appliedSearch.term}
         filterBy={appliedSearch.filter}
+        onUpdate={handleReloadPosts}
       />
 
-      {/* Modal de crear post */}
-      {showCreatePost && (
-        <div className="modal-overlay" onClick={() => setShowCreatePost(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <CreatePost onPostCreated={() => setShowCreatePost(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* Modal lateral de opciones */}
-      {showOpciones && (
-        <div className="side-overlay" onClick={() => setShowOpciones(false)}>
-          <div className="side-panel" onClick={(e) => e.stopPropagation()}>
-            <OpcionesPerfil onClose={() => setShowOpciones(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* Botón flotante */}
+      {/* Botón flotante de crear post */}
       <button
         onClick={() => setShowCreatePost(true)}
         className="floating-btn btn btn-brown"
       >
         +
       </button>
+
+      {/* Modal crear post */}
+      {showCreatePost && (
+        <div className="modal-overlay" onClick={() => setShowCreatePost(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <CreatePost
+              onPostCreated={() => {
+                setShowCreatePost(false);
+                handleReloadPosts(); // Recarga posts al crear uno nuevo
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Panel OpcionesPerfil */}
+      {showOpciones && <OpcionesPerfil onClose={() => setShowOpciones(false)} />}
     </div>
   );
 };

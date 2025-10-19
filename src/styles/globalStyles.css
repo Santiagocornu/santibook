@@ -1,3 +1,8 @@
+/* ================== Tipografía global ================== */
+body, input, select, button {
+  font-family: 'Arial', sans-serif;
+}
+
 /* ================== Botones ================== */
 .btn {
   border: none;
@@ -8,7 +13,6 @@
   transition: all 0.2s ease-in-out;
   box-shadow: 0 0 6px rgba(0,0,0,0.2);
   color: white;
-  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,19 +48,22 @@
 
 /* ================== Inputs ================== */
 input, select {
-  padding: 8px 12px;
+  padding: 12px 16px;
   border-radius: 9999px;
-  border: 1px solid #ccc;
+  border: 2px solid #d4c4a8;
   outline: none;
-  background-color: white;
+  background-color: #fdfaf5;
   text-align: center;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  color: #5b3f2a;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
   border-color: #5b3f2a;
-  box-shadow: 0 0 8px rgba(91,63,42,0.8);
+  box-shadow: 0 0 8px rgba(91,63,42,0.4);
 }
 
 /* ================== Navbar ================== */
@@ -72,7 +79,7 @@ input:focus, select:focus {
   box-sizing: border-box;
 }
 
-/* Secciones de navbar */
+/* Secciones del navbar */
 .navbar-left,
 .navbar-center,
 .navbar-right {
@@ -94,7 +101,6 @@ input:focus, select:focus {
   justify-content: center;
 }
 
-/* Limitar ancho máximo de search bar */
 .navbar-center .search-bar {
   max-width: 400px;
   width: 100%;
@@ -115,8 +121,7 @@ input:focus, select:focus {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  color: #fff;
- 
+  color: #5b3f2a;
 }
 
 .form-card {
@@ -127,17 +132,20 @@ input:focus, select:focus {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 320px;
+  width: 360px;
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* se quitó el hover para que no “salte” */
 }
 
-.form-card:hover {
-  transform: scale(1.01);
+/* ================== Botones fila final ================== */
+.btn-row-end {
+  display: flex;
+  justify-content: center; 
+  gap: 15px;
 }
 
 /* ================== Otros ================== */
-p {
+p, li {
   margin: 0;
   text-align: center;
 }
@@ -146,11 +154,6 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-li {
-  margin: 5px 0;
-  text-align: center;
 }
 
 /* Botón flotante */
@@ -169,5 +172,21 @@ li {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  /* sin hover para no afectar contenedor */
 }
 
+
+.spinner {
+  margin: 0 auto;
+  width: 50px;
+  height: 50px;
+  border: 6px solid #f3f3f3; /* gris claro */
+  border-top: 6px solid #8B4513; /* marrón */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

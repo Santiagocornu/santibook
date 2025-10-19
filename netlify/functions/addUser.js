@@ -9,7 +9,7 @@ exports.handler = async function (event, context) {
 
   try {
     const data = JSON.parse(event.body);
-    const { uid, displayName, email } = data;
+    const { uid, displayName, email, photoURL, type, createdAt } = data;
 
     if (!uid) return { statusCode: 400, body: "UID is required" };
 
@@ -17,22 +17,32 @@ exports.handler = async function (event, context) {
     const db = client.db("Santibook");
     const collection = db.collection("users");
 
-    // Evitar duplicados
+    // Evitar duplicados: buscar por UID
     const existing = await collection.findOne({ uid });
     if (existing) {
       return { statusCode: 200, body: JSON.stringify(existing) };
     }
 
-    const newUser = { uid, displayName: displayName || "", email: email || "" };
+    // Crear nuevo usuario con todos los campos enviados desde Login.jsx
+    const newUser = {
+      uid,
+      displayName: displayName || "",
+      email: email || "",
+      photoURL: photoURL || "",  
+      type: type || "user",  
+      createdAt: createdAt || new Date(),  
+    };
+
     const result = await collection.insertOne(newUser);
 
+    // Devolver el usuario creado, incluyendo el _id generado
     return {
-      statusCode: 200,
-      body: JSON.stringify(newUser),
+      statusCode: 201,
+      body: JSON.stringify({ ...newUser, _id: result.insertedId }),
     };
   } catch (error) {
-    console.error(error);
-    return { statusCode: 500, body: error.message };
+    console.error("Error en addUser:", error);
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   } finally {
     await client.close();
   }

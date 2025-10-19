@@ -99,7 +99,7 @@
 
 .password-input-container input {
   width: 100%;
-  padding-right: 40px; /* espacio para el botón del ojo */
+  padding-right: 40px; 
   box-sizing: border-box;
 }
 
@@ -132,4 +132,9 @@
 .btn-row-login .btn {
   flex: 1;
   text-align: center;
+}
+
+.icon-btn {
+  margin-right: 8px; 
+  font-size: 1rem;
 }

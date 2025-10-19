@@ -1,7 +1,9 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/globalStyles.css"; 
+
 import "../styles/LoginStyles.css";
+import "../styles/globalStyles.css"; 
+
 import { auth, googleProvider, facebookProvider } from "../db/firebase";
 import { signInWithPopup, signInAnonymously } from "firebase/auth";
 import Swal from "sweetalert2";
@@ -18,21 +20,24 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Crear usuario en MongoDB si no existe
+      // Crear usuario en MongoDB si no existe, usando datos de Firebase
       await fetch("/.netlify/functions/addUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid: user.uid,
-          email: user.email || null,
-          displayName: user.displayName || null,
-          photoURL: user.photoURL || null,
+          email: user.email || null,  
+          displayName: user.displayName || null, 
+          photoURL: user.photoURL || null, 
           type: "user",
           createdAt: new Date(),
         }),
       });
 
+      // Navegar a home después de login exitoso
       
+        navigate("/");
+     
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }
@@ -44,9 +49,9 @@ const Login = () => {
   const handleGuestLogin = async () => {
     try {
       await signInAnonymously(auth);
-      Swal.fire("¡Éxito!", "Has ingresado como invitado", "success").then(() => {
+      
         navigate("/");
-      });
+    
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }

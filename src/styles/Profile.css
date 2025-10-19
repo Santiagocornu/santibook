@@ -1,0 +1,196 @@
+/* Profile.css */
+
+/* ================== Contenedor principal ================== */
+.profile-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  
+  color: #222;
+  text-align: center;
+}
+
+/* ================== Foto de perfil ================== */
+.profile-container .profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #8e6e53;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.profile-container .profile-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(142,110,83,0.6);
+}
+
+/* ================== Nombre y botón ================== */
+.profile-name-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.profile-name-container h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #8e6e53;
+}
+
+.btn-edit-profile {
+  background-color: #8e6e53;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-edit-profile:hover {
+  background-color: #a5805f;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(165,128,95,0.5);
+}
+
+/* ================== Info de perfil ================== */
+.profile-info {
+  margin-top: 10px;
+  text-align: left;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.profile-info p {
+  margin: 5px 0;
+}
+
+/* ================== Botón volver ================== */
+.btn-back-home {
+  margin-top: 15px;
+  background-color: #8e6e53;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-back-home:hover {
+  background-color: #2ecc71;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(46,204,113,0.5);
+}
+
+/* ================== Sección de posts ================== */
+.profile-posts {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ================== Responsive ================== */
+@media (max-width: 500px) {
+  .profile-container {
+    padding: 15px;
+  }
+
+  .profile-name-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .profile-container .profile-img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Botón volver a home fijo en esquina izquierda */
+.btn-back-home {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+}
+
+/* Foto de perfil sin hover */
+.profile-img-nohover {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  /* sin transform ni shadow en hover */
+}
+
+/* Contenedor y estilos generales */
+.profile-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: #222;
+}
+
+/* Nombre y botón editar */
+.profile-name-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Info del usuario */
+.profile-info p {
+  margin: 5px 0;
+  color: #4b3621; /* marrón oscuro */
+}
+
+/* Posts */
+.profile-posts {
+  margin-top: 20px;
+}
+
+/* Loader centrado */
+.profile-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  flex-direction: column;
+}
+
+/* Círculo girando marrón */
+.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #8e6e53; /* marrón */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Usuario no disponible */
+.user-unavailable {
+  font-size: 2rem;
+  color: #8e6e53;
+  text-align: center;
+  margin: 0;
+}

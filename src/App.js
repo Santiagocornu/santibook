@@ -6,31 +6,36 @@ import Home from "./components/Home";
 import { auth } from "./db/firebase";
 import { useEffect, useState } from "react";
 import LoginEmail from "./components/LoginEmail";
+import Profile from "./components/Profile";
+import EditProfile from "./components/EditProfile";
 
-function App() {
+
+  function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true); 
 
-  // Escucha cambios de autenticación en Firebase
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
+      setIsAuthenticated(!!user);
+      setCheckingAuth(false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  if (checkingAuth) {
+    return <p>Cargando...</p>;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rutas públicas */}
+        {/* rutas públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
-        <Route path="/login-email" element={<LoginEmail/>}/> 
-        {/* Ruta protegida */}
+        <Route path="/login-email" element={<LoginEmail />} />
+
+        {/* rutas protegidas */}
         <Route
           path="/"
           element={
@@ -39,9 +44,26 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/ver-perfil/:uid"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editar-perfil/:uid"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
+
 
 export default App;

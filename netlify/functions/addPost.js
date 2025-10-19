@@ -1,33 +1,57 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient } = require("mongodb");
 
 const client = new MongoClient(process.env.MONGO_URI);
 
 exports.handler = async (event) => {
-  try {
-    const { uid, displayName, title, content } = JSON.parse(event.body);
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Método no permitido" }),
+    };
+  }
 
+  try {
+    const { uid, displayName, photoURL, title, content, type } = JSON.parse(event.body);
+
+    // Validar datos obligatorios
     if (!uid || !displayName || !title || !content) {
-      return { statusCode: 400, body: 'Faltan datos obligatorios' };
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan datos obligatorios" }),
+      };
     }
 
     await client.connect();
-    const db = client.db('Santibook');
-    const collection = db.collection('post');
+    const db = client.db("Santibook");
+    const collection = db.collection("post");
 
-    const result = await collection.insertOne({
+    const newPost = {
       uid,
       displayName,
+      photoURL: photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       title,
       content,
       createdAt: new Date(),
-      type: 'post'
-    });
+      type: type || "post",
+      editado: false,
+    };
+
+    const result = await collection.insertOne(newPost);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Post creado', id: result.insertedId }),
+      body: JSON.stringify({
+        message: "Post creado correctamente",
+        post: { ...newPost, _id: result.insertedId },
+      }),
     };
   } catch (err) {
-    return { statusCode: 500, body: err.message };
+    console.error("Error creando post:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
+  } finally {
+    await client.close();
   }
 };

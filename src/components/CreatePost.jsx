@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { auth } from "../db/firebase";
 import Swal from "sweetalert2";
 import "../styles/globalStyles.css";
-import "../styles/PostCard.css"
+import "../styles/PostCard.css";
 
 const CreatePost = ({ onPostCreated, onCancel }) => {
   const [user, setUser] = useState(null);
@@ -26,17 +26,15 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
       return;
     }
 
-    if (!title || !body) {
+    if (!title.trim() || !body.trim()) {
       Swal.fire("Error", "Debes completar el título y el cuerpo del post", "error");
       return;
     }
 
-    const uid = user.uid;
-    const displayName = user.displayName || "Usuario";
-
     const newPost = {
-      uid,
-      displayName,
+      uid: user.uid,
+      displayName: user.displayName || "Usuario",
+      photoURL: user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png", // ✅ agregado
       title,
       content: body,
       createdAt: new Date(),
@@ -87,8 +85,7 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
           placeholder="Escribe algo para la gente..."
           value={body}
           onChange={(e) => setBody(e.target.value.slice(0, maxChars))}
-          className="input-white"
-          style={{ height: "120px" }} 
+          className="input-white textarea-post"
           disabled={loading}
         />
 
