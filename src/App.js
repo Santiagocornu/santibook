@@ -9,6 +9,7 @@ import LoginEmail from "./components/LoginEmail";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import Chats from "./components/ChatComponents/Chats";
+import ShowChat from "./components/ChatComponents/ShowChat";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -65,6 +66,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/chat/:_id"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ShowChat />
+            </ProtectedRoute>
+          }
+        />
+        
       </Routes>
     </BrowserRouter>
   );

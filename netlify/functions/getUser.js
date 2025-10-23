@@ -6,7 +6,7 @@ exports.handler = async function (event, context) {
   try {
     // Crea una nueva conexión por petición
     client = new MongoClient(process.env.MONGO_URI);
-    console.log("Conectando a MongoDB para getUsers...");
+    
     await client.connect();
     const db = client.db("Santibook");
     const collection = db.collection("users");
@@ -18,7 +18,6 @@ exports.handler = async function (event, context) {
       body: JSON.stringify(users),
     };
   } catch (error) {
-    console.error("Error en getUsers:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),
