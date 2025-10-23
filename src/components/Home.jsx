@@ -8,7 +8,7 @@ import Posts from "./Posts";
 import CreatePost from "./CreatePost";
 import OpcionesPerfil from "./OpcionesPerfil";
 import { usePosts } from "../coostomhooks/usePosts";
-
+import { FaEnvelope } from "react-icons/fa";
 const Home = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -18,7 +18,6 @@ const Home = () => {
   const [showOpciones, setShowOpciones] = useState(false);
   const [appliedSearch, setAppliedSearch] = useState({ term: "", filter: "todo" });
 
-  // **Estado centralizado de posts desde el hook**
   const { posts: fetchedPosts, loading, error, refetch } = usePosts();
 
   useEffect(() => {
@@ -31,9 +30,7 @@ const Home = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      Swal.fire("¡Éxito!", "Has cerrado sesión", "success").then(() => {
-        navigate("/login");
-      });
+      navigate("/login");
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }
@@ -47,9 +44,7 @@ const Home = () => {
   };
 
   const handleReloadPosts = async () => {
-    if (refetch) {
-      await refetch(); 
-    }
+    if (refetch) await refetch();
   };
 
   return (
@@ -121,9 +116,9 @@ const Home = () => {
         {user && user.isAnonymous && <p>Bienvenido invitado</p>}
       </div>
 
-      {/* Posts filtrados, ahora reciben los posts directamente desde el hook */}
+      {/* Posts */}
       <Posts
-        posts={fetchedPosts}  
+        posts={fetchedPosts}
         loading={loading}
         error={error}
         searchTerm={appliedSearch.term}
@@ -131,7 +126,16 @@ const Home = () => {
         onUpdate={handleReloadPosts}
       />
 
-      {/* Botón flotante de crear post */}
+      {/* Botón de buzón */}
+      <button
+        onClick={() => navigate("/chats")}
+        className="floating-btn btn btn-brown"
+        style={{ bottom: "110px" }} 
+         >
+        <FaEnvelope size={22} />
+      </button>
+
+      {/* Botón de crear post */}
       <button
         onClick={() => setShowCreatePost(true)}
         className="floating-btn btn btn-brown"
@@ -143,10 +147,10 @@ const Home = () => {
       {showCreatePost && (
         <div className="modal-overlay" onClick={() => setShowCreatePost(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <CreatePost
+            <CreatePost 
               onPostCreated={() => {
                 setShowCreatePost(false);
-                handleReloadPosts(); // Recarga posts al crear uno nuevo
+                handleReloadPosts();
               }}
             />
           </div>

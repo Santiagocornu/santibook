@@ -3,11 +3,10 @@ import { useState, useEffect } from 'react';
 export function usePosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Agregado estado para errores
-
+  const [error, setError] = useState(null); 
   const fetchPosts = async () => {
     setLoading(true);
-    setError(null); // Resetear error antes de fetch
+    setError(null);
     try {
       const res = await fetch('/.netlify/functions/getPosts');
       if (!res.ok) {

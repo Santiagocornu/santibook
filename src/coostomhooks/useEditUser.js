@@ -1,4 +1,3 @@
-// coostomhooks/useEditUser.js
 import { useState } from "react";
 
 export const useEditUser = () => {
@@ -10,8 +9,8 @@ export const useEditUser = () => {
       const res = await fetch("/.netlify/functions/editUser", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData), 
-     });
+        body: JSON.stringify(userData), // aquí userData puede incluir bio
+      });
 
       if (!res.ok) throw new Error("Error al actualizar usuario");
       return await res.json();

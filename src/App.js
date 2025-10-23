@@ -8,34 +8,31 @@ import { useEffect, useState } from "react";
 import LoginEmail from "./components/LoginEmail";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
+import Chats from "./components/ChatComponents/Chats";
 
-
-  function App() {
+function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true); 
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
       setCheckingAuth(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  if (checkingAuth) {
-    return <p>Cargando...</p>;
-  }
+  if (checkingAuth) return <p>Cargando...</p>;
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* rutas públicas */}
+        {/* públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
         <Route path="/login-email" element={<LoginEmail />} />
 
-        {/* rutas protegidas */}
+        {/* protegidas */}
         <Route
           path="/"
           element={
@@ -60,10 +57,17 @@ import EditProfile from "./components/EditProfile";
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/chats"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Chats />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
-
 
 export default App;

@@ -1,26 +1,32 @@
+// /.netlify/functions/getUsers.js
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
-
 exports.handler = async function (event, context) {
+  let client; // Declara el cliente aquí
   try {
-    const { uid } = event.queryStringParameters || {};
-    if (!uid) return { statusCode: 400, body: "UID is required" };
-
+    // Crea una nueva conexión por petición
+    client = new MongoClient(process.env.MONGO_URI);
+    console.log("Conectando a MongoDB para getUsers...");
     await client.connect();
     const db = client.db("Santibook");
     const collection = db.collection("users");
 
-    const user = await collection.findOne({ uid });
+    const users = await collection.find({}).toArray();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(user || {}),
+      body: JSON.stringify(users),
     };
   } catch (error) {
-    console.error(error);
-    return { statusCode: 500, body: error.message };
+    console.error("Error en getUsers:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
   } finally {
-    await client.close();
+    // Cierra la conexión solo si existe
+    if (client) {
+      await client.close();
+    }
   }
 };

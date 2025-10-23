@@ -64,6 +64,16 @@ const OpcionesPerfil = ({ onClose }) => {
     onClose();
   };
 
+  const handleConfigAccount = () => {
+    const user = auth.currentUser;
+    if (user) {
+      navigate(`/editar-perfil/${user.uid}`);
+      onClose();
+    } else {
+      Swal.fire("Error", "No hay ningún usuario activo.", "error");
+    }
+  };
+
   return (
     <div
       className="profile-dropdown-overlay"
@@ -92,13 +102,7 @@ const OpcionesPerfil = ({ onClose }) => {
         </button>
         <button
           className="btn btn-brown"
-          onClick={() =>
-            Swal.fire(
-              "Próximamente",
-              "Configuración aún no implementada",
-              "info"
-            )
-          }
+          onClick={handleConfigAccount}
           disabled={loading}
         >
           Configurar cuenta

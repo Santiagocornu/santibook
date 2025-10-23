@@ -1,7 +1,7 @@
 // EditProfile.jsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../db/firebase";
-import { updateProfile as fbUpdateProfile } from "firebase/auth"; // <-- modular updateProfile
+import { updateProfile as fbUpdateProfile } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useEditUser } from "../coostomhooks/useEditUser";
@@ -16,6 +16,7 @@ const EditProfile = () => {
   const [userData, setUserData] = useState({
     displayName: "",
     photoURL: "",
+    bio: "",
   });
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const EditProfile = () => {
         setUserData({
           displayName: currentUser.displayName || "",
           photoURL: currentUser.photoURL || "",
+          bio: "",
         });
       } catch (err) {
         console.error(err);
@@ -43,6 +45,10 @@ const EditProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Limitar caracteres
+    if (name === "displayName" && value.length > 30) return;
+    if (name === "bio" && value.length > 255) return;
+
     setUserData({ ...userData, [name]: value });
   };
 
@@ -54,18 +60,17 @@ const EditProfile = () => {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuario no autenticado");
 
-      // Usamos la función modular de firebase/auth
       await fbUpdateProfile(user, {
         displayName: userData.displayName,
         photoURL: userData.photoURL || null,
       });
 
-      // Actualiza en MongoDB usando tu hook
       await editUser({
         uid,
         displayName: userData.displayName,
-        email: user.email, 
+        email: user.email,
         photoURL: userData.photoURL,
+        bio: userData.bio,
       });
 
       Swal.fire("Perfil actualizado", "", "success");
@@ -93,41 +98,60 @@ const EditProfile = () => {
 
       <h2 style={{ textAlign: "center", margin: "20px 0" }}>Editar Perfil</h2>
 
-      <form className="edit-profile-form" onSubmit={handleSubmit}>
-        <div className="edit-photo-preview">
-          <img
-            src={
-              userData.photoURL ||
-              "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            }
-            alt="Preview"
-            className="profile-img"
-          />
-        </div>
+      <form className="edit-profile-form" onSubmit={handleSubmit} style={{ maxWidth: "500px", margin: "0 auto" }}>
+  <div className="edit-photo-preview" style={{ textAlign: "center", marginBottom: "20px" }}>
+    <img
+      src={userData.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+      alt="Preview"
+      className="profile-img"
+      style={{ borderRadius: "50%", width: "100px", height: "100px" }}
+    />
+  </div>
 
-        <label>Nombre:</label>
-        <input
-          type="text"
-          name="displayName"
-          value={userData.displayName}
-          onChange={handleChange}
-          placeholder="Nombre"
-          required
-        />
+  <label style={{ display: "block", margin: "15px 0 5px" }}>Nombre:</label>
+  <input
+    type="text"
+    name="displayName"
+    value={userData.displayName}
+    onChange={handleChange}
+    placeholder="Nombre"
+    required
+    maxLength={30}
+    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+  />
 
-        <label>URL de imagen:</label>
-        <input
-          type="text"
-          name="photoURL"
-          value={userData.photoURL}
-          onChange={handleChange}
-          placeholder="https://tu-imagen.jpg"
-        />
+  <label style={{ display: "block", margin: "15px 0 5px" }}>URL de imagen:</label>
+  <input
+    type="text"
+    name="photoURL"
+    value={userData.photoURL}
+    onChange={handleChange}
+    placeholder="https://tu-imagen.jpg"
+    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+  />
 
-        <button type="submit" className="btn btn-green" style={{ marginTop: "15px" }}>
-          Guardar cambios
-        </button>
-      </form>
+  <label style={{ display: "block", margin: "15px 0 5px" }}>Bio:</label>
+  <input
+    name="bio"
+    value={userData.bio}
+    onChange={handleChange}
+    placeholder="Escribe una breve descripción sobre ti..."
+    rows={4}
+    maxLength={255}
+    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc", resize: "none" }}
+  />
+
+  <div style={{ textAlign: "center", marginTop: "25px" }}>
+    <button
+      type="submit"
+      className="btn btn-green"
+      style={{ padding: "10px 30px", borderRadius: "25px", cursor: "pointer" }}
+    >
+      Guardar cambios
+    </button>
+  </div>
+</form>
+
     </div>
   );
 };

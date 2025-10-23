@@ -1,31 +1,27 @@
 import { useState, useEffect } from "react";
 
-export const useUser = (uid) => {
-  const [user, setUser] = useState(null);
+export const useUser = () => {
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/.netlify/functions/getUser`);
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+      setError("Error al obtener usuarios");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!uid) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+    fetchUsers();
+  }, []);
 
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`/.netlify/functions/getUser?uid=${uid}`);
-        const data = await res.json();
-        setUser(data);
-      } catch (error) {
-        console.error(error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [uid]);
-
-  return { user, loading };
+  return { users, loading, error, refetch: fetchUsers };
 };
