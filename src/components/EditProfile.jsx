@@ -5,7 +5,6 @@ import { updateProfile as fbUpdateProfile } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useEditUser } from "../coostomhooks/useEditUser";
-import "../styles/Profile.css";
 
 const EditProfile = () => {
   const { uid } = useParams();
@@ -45,10 +44,8 @@ const EditProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Limitar caracteres
     if (name === "displayName" && value.length > 30) return;
     if (name === "bio" && value.length > 255) return;
-
     setUserData({ ...userData, [name]: value });
   };
 
@@ -85,73 +82,161 @@ const EditProfile = () => {
 
   if (loading || loadingEdit)
     return (
-      <div className="profile-center">
-        <div className="loader"></div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh",
+        }}
+      >
+        <div
+          className="spinner"
+          style={{ width: "80px", height: "80px", borderColor: "#8e6e53" }}
+        ></div>
       </div>
     );
 
   return (
-    <div className="profile-container">
-      <button className="btn-back-home btn-brown" onClick={() => navigate(-1)}>
+    <div
+      style={{
+        maxWidth: "500px",
+        margin: "3rem auto",
+        padding: "2rem",
+        backgroundColor: "#f5f3f0",
+        borderRadius: "16px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        position: "relative",
+      }}
+    >
+      {/* Botón volver */}
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          position: "absolute",
+          top: "15px",
+          left: "15px",
+          backgroundColor: "#8e6e53",
+          color: "white",
+          border: "none",
+          padding: "8px 14px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
         ← Volver
       </button>
 
-      <h2 style={{ textAlign: "center", margin: "20px 0" }}>Editar Perfil</h2>
+      <h2
+        style={{
+          textAlign: "center",
+          marginBottom: "1.5rem",
+          color: "#4a3b2a",
+        }}
+      >
+        Editar Perfil
+      </h2>
 
-      <form className="edit-profile-form" onSubmit={handleSubmit} style={{ maxWidth: "500px", margin: "0 auto" }}>
-  <div className="edit-photo-preview" style={{ textAlign: "center", marginBottom: "20px" }}>
-    <img
-      src={userData.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
-      alt="Preview"
-      className="profile-img"
-      style={{ borderRadius: "50%", width: "100px", height: "100px" }}
-    />
-  </div>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
+        {/* Imagen */}
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          <img
+            src={
+              userData.photoURL ||
+              "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+            }
+            alt="Preview"
+            style={{
+              borderRadius: "50%",
+              width: "100px",
+              height: "100px",
+              objectFit: "cover",
+              boxShadow: "0 0 6px rgba(0,0,0,0.2)",
+            }}
+          />
+        </div>
 
-  <label style={{ display: "block", margin: "15px 0 5px" }}>Nombre:</label>
-  <input
-    type="text"
-    name="displayName"
-    value={userData.displayName}
-    onChange={handleChange}
-    placeholder="Nombre"
-    required
-    maxLength={30}
-    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
-  />
+        {/* Nombre */}
+        <label style={{ marginBottom: "5px", color: "#4a3b2a", fontWeight: "bold" }}>
+          Nombre:
+        </label>
+        <input
+          type="text"
+          name="displayName"
+          value={userData.displayName}
+          onChange={handleChange}
+          placeholder="Nombre"
+          required
+          maxLength={30}
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            marginBottom: "15px",
+          }}
+        />
 
-  <label style={{ display: "block", margin: "15px 0 5px" }}>URL de imagen:</label>
-  <input
-    type="text"
-    name="photoURL"
-    value={userData.photoURL}
-    onChange={handleChange}
-    placeholder="https://tu-imagen.jpg"
-    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
-  />
+        {/* Imagen */}
+        <label style={{ marginBottom: "5px", color: "#4a3b2a", fontWeight: "bold" }}>
+          URL de imagen:
+        </label>
+        <input
+          type="text"
+          name="photoURL"
+          value={userData.photoURL}
+          onChange={handleChange}
+          placeholder="https://tu-imagen.jpg"
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            marginBottom: "15px",
+          }}
+        />
 
-  <label style={{ display: "block", margin: "15px 0 5px" }}>Bio:</label>
-  <input
-    name="bio"
-    value={userData.bio}
-    onChange={handleChange}
-    placeholder="Escribe una breve descripción sobre ti..."
-    rows={4}
-    maxLength={255}
-    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc", resize: "none" }}
-  />
+        {/* Bio */}
+        <label style={{ marginBottom: "5px", color: "#4a3b2a", fontWeight: "bold" }}>
+          Bio:
+        </label>
+        <textarea
+          name="bio"
+          value={userData.bio}
+          onChange={handleChange}
+          placeholder="Escribe una breve descripción sobre ti..."
+          rows={4}
+          maxLength={255}
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            resize: "none",
+            marginBottom: "20px",
+          }}
+        />
 
-  <div style={{ textAlign: "center", marginTop: "25px" }}>
-    <button
-      type="submit"
-      className="btn btn-green"
-      style={{ padding: "10px 30px", borderRadius: "25px", cursor: "pointer" }}
-    >
-      Guardar cambios
-    </button>
-  </div>
-</form>
-
+        {/* Botón guardar */}
+        <div style={{ textAlign: "center" }}>
+          <button
+            type="submit"
+            disabled={loadingEdit}
+            style={{
+              backgroundColor: "#8e6e53",
+              color: "white",
+              border: "none",
+              padding: "10px 30px",
+              borderRadius: "25px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#725840")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#8e6e53")}
+          >
+            {loadingEdit ? "Guardando..." : "Guardar cambios"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

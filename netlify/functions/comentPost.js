@@ -1,24 +1,40 @@
 const { MongoClient, ObjectId } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+const uri = process.env.MONGO_URI;
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  if (!cachedClient) {
+    cachedClient = new MongoClient(uri);
+    await cachedClient.connect();
+  }
+  cachedDb = cachedClient.db("Santibook");
+  return cachedDb;
+}
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
+  }
+
   try {
     const { postId, uid, displayName, photoURL, content } = JSON.parse(event.body);
 
     if (!postId || !uid || !content) {
-      return { statusCode: 400, body: "postId, uid y content son requeridos" };
+      return { statusCode: 400, body: JSON.stringify({ message: "postId, uid y content son requeridos" }) };
     }
 
-    await client.connect();
-    const db = client.db("Santibook");
+    const db = await connectToDatabase();
     const collection = db.collection("post");
 
-    // Creamos el comentario
     const newComment = {
       uid,
       displayName: displayName || "Usuario",
@@ -27,14 +43,13 @@ exports.handler = async function (event) {
       createdAt: new Date(),
     };
 
-    // Actualizamos el post agregando el comentario
     const result = await collection.updateOne(
       { _id: new ObjectId(postId) },
       { $push: { comentarios: newComment } }
     );
 
     if (result.modifiedCount === 0) {
-      return { statusCode: 404, body: "Post no encontrado" };
+      return { statusCode: 404, body: JSON.stringify({ message: "Post no encontrado" }) };
     }
 
     return {
@@ -42,9 +57,7 @@ exports.handler = async function (event) {
       body: JSON.stringify({ message: "Comentario agregado", comment: newComment }),
     };
   } catch (error) {
-    console.error(error);
-    return { statusCode: 500, body: error.message };
-  } finally {
-    await client.close();
+    console.error("Error en comentPost:", error);
+    return { statusCode: 500, body: JSON.stringify({ message: error.message }) };
   }
 };

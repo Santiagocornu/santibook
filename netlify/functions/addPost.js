@@ -3,6 +3,17 @@ const { MongoClient } = require("mongodb");
 const client = new MongoClient(process.env.MONGO_URI);
 
 exports.handler = async (event) => {
+  // Verifica la API Key al inicio
+  const apiKey = event.headers["x-api-key"] || event.headers["X-API-Key"];
+  const expectedKey = process.env.API_SECRET_KEY;
+
+  if (!apiKey || apiKey !== expectedKey) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: "API Key inválida" }),
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,

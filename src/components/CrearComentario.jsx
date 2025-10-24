@@ -51,10 +51,11 @@ const CrearComentario = ({ postId, onCommentAdded }) => {
       {open && (
         <div
           className="modal-overlay"
+          
           onClick={() => setOpen(false)}
         >
           <div
-            className="modal-content"
+            className="create-content"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="modal-title">Dejar un comentario</h3>

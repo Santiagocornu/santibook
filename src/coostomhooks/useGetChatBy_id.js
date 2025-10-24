@@ -13,9 +13,14 @@ export const useChatById = (id) => {
       setError(null);
 
       try {
-        const res = await fetch(`/.netlify/functions/getChatBy_id?id=${id}`);
+        const res = await fetch(`/.netlify/functions/getChatBy_id?id=${id}`, {
+          headers: {
+            "x-api-key": process.env.REACT_APP_API_SECRET_KEY,
+          },
+        });
         if (!res.ok) {
-          throw new Error("Error al obtener el chat");
+          const data = await res.json();
+          throw new Error(data.error || "Error al obtener el chat");
         }
         const data = await res.json();
         setChat(data);

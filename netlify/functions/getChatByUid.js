@@ -1,25 +1,32 @@
-// netlify/functions/getChatByUid.js
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+let client; // reutilizamos conexión entre invocaciones
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  try {
-    const uid = event.queryStringParameters.uid;
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: "Unauthorized" };
+  }
 
+  try {
+    const uid = event.queryStringParameters?.uid;
     if (!uid) {
       return { statusCode: 400, body: "UID is required" };
     }
 
-    await client.connect();
+    if (!client) {
+      client = new MongoClient(process.env.MONGO_URI);
+      await client.connect();
+    }
+
     const db = client.db("Santibook");
     const chatsCollection = db.collection("chats");
 
-    // Buscar todos los chats donde el usuario esté en el array "usuarios"
     const chats = await chatsCollection
       .find({ usuarios: { $in: [uid] } })
       .sort({ "content.date": -1 })
@@ -31,8 +38,9 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error("Error getting chats:", error);
-    return { statusCode: 500, body: error.message };
-  } finally {
-    await client.close();
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: error.message }),
+    };
   }
 };

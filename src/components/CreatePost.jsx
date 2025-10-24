@@ -3,6 +3,7 @@ import { auth } from "../db/firebase";
 import Swal from "sweetalert2";
 import "../styles/globalStyles.css";
 import "../styles/PostCard.css";
+import { usePosts } from "../coostomhooks/usePosts"; // ✅ import del hook
 
 const CreatePost = ({ onPostCreated, onCancel }) => {
   const [user, setUser] = useState(null);
@@ -10,6 +11,8 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
   const maxChars = 255;
+
+  const { addPost } = usePosts(); // ✅ usar función del hook
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -31,36 +34,18 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
       return;
     }
 
-    const newPost = {
-      uid: user.uid,
-      displayName: user.displayName || "Usuario",
-      photoURL: user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png", // ✅ agregado
-      title,
-      content: body,
-      createdAt: new Date(),
-      type: "post",
-    };
-
     try {
       setLoading(true);
-      const response = await fetch("/.netlify/functions/addPost", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPost),
-      });
-
-      if (!response.ok) throw new Error("Error al guardar el post");
-
-      const result = await response.json();
+      await addPost(title, body); 
       Swal.fire("Éxito", "Post creado correctamente", "success");
 
       setTitle("");
       setBody("");
 
-      if (onPostCreated) onPostCreated(result);
+      if (onPostCreated) onPostCreated(); 
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", error.message, "error");
+      Swal.fire("Error", error.message || "Error al crear el post", "error");
     } finally {
       setLoading(false);
     }

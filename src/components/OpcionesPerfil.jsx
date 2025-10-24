@@ -3,11 +3,30 @@ import { auth } from "../db/firebase";
 import Swal from "sweetalert2";
 import { useDeleteUser } from "../coostomhooks/useDeleteUser";
 import { useNavigate } from "react-router-dom";
+import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
 const OpcionesPerfil = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const { deleteUser } = useDeleteUser();
   const navigate = useNavigate();
+
+  const reauthenticateUser = async (user) => {
+    const { value: password } = await Swal.fire({
+      title: "Reingresá tu contraseña",
+      input: "password",
+      inputLabel: "Por seguridad, ingresá tu contraseña para continuar.",
+      inputPlaceholder: "Contraseña",
+      inputAttributes: { autocapitalize: "off", autocorrect: "off" },
+      showCancelButton: true,
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!password) throw new Error("Operación cancelada por el usuario.");
+
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+  };
 
   const handleDeleteAccount = async () => {
     const user = auth.currentUser;
@@ -38,14 +57,30 @@ const OpcionesPerfil = ({ onClose }) => {
         didOpen: () => Swal.showLoading(),
       });
 
+      // 1️⃣ Elimina el usuario de MongoDB
       await deleteUser(user.uid);
-      await user.delete();
+
+      // 2️⃣ Elimina el usuario de Firebase (con reautenticación si hace falta)
+      try {
+        await user.delete();
+      } catch (error) {
+        if (error.code === "auth/requires-recent-login") {
+          await reauthenticateUser(user);
+          await user.delete(); // reintentar luego de reautenticar
+        } else {
+          throw error;
+        }
+      }
 
       Swal.fire(
         "Cuenta eliminada",
         "Tu cuenta fue eliminada exitosamente.",
         "success"
-      ).then(() => window.location.reload());
+      ).then(() => {
+        auth.signOut();
+        navigate("/login");
+        window.location.reload();
+      });
     } catch (error) {
       console.error("Error al eliminar cuenta:", error);
       Swal.fire("Error", error.message, "error");
@@ -100,6 +135,7 @@ const OpcionesPerfil = ({ onClose }) => {
         >
           {auth.currentUser ? "Visitar perfil" : "Iniciar sesión"}
         </button>
+
         <button
           className="btn btn-brown"
           onClick={handleConfigAccount}
@@ -107,6 +143,7 @@ const OpcionesPerfil = ({ onClose }) => {
         >
           Configurar cuenta
         </button>
+
         {auth.currentUser && (
           <button
             className="btn btn-red"

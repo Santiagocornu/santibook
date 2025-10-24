@@ -1,7 +1,6 @@
-// netlify/functions/toggleFollower.js
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+let client; // Reutilizamos conexión entre invocaciones
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "PUT") {
@@ -10,6 +9,12 @@ exports.handler = async function (event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "Method Not Allowed" }),
     };
+  }
+
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
   }
 
   try {
@@ -23,7 +28,11 @@ exports.handler = async function (event) {
       };
     }
 
-    await client.connect();
+    if (!client) {
+      client = new MongoClient(process.env.MONGO_URI);
+      await client.connect();
+    }
+
     const db = client.db("Santibook");
     const collection = db.collection("users");
 
@@ -68,7 +77,5 @@ exports.handler = async function (event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: error.message || "Internal Server Error" }),
     };
-  } finally {
-    await client.close();
   }
 };

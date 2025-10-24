@@ -17,32 +17,38 @@ const Chats = () => {
   const [otherUsersData, setOtherUsersData] = useState({});
 
   useEffect(() => {
-    if (!chats || chats.length === 0) return;
+  if (!chats || chats.length === 0) return;
 
-    const fetchOtherUsers = async () => {
-      const data = {};
-      await Promise.all(
-        chats.map(async (chat) => {
-          const otherUid = chat.usuarios.find((u) => u !== uid);
-          if (!otherUid) return;
+  const fetchOtherUsers = async () => {
+    const data = {};
+    await Promise.all(
+      chats.map(async (chat) => {
+        const otherUid = chat.usuarios.find((u) => u !== uid);
+        if (!otherUid) return;
 
-          try {
-            const res = await fetch(
-              `/.netlify/functions/getUserByUid?uid=${otherUid}`
-            );
-            if (!res.ok) throw new Error("Error al obtener usuario");
-            const userData = await res.json();
-            data[otherUid] = userData;
-          } catch (err) {
-            console.error("Error fetching user:", err);
-          }
-        })
-      );
-      setOtherUsersData(data);
-    };
+        try {
+          const res = await fetch(
+            `/.netlify/functions/getUserByUid?uid=${otherUid}`,
+            {
+              headers: {
+                "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+              },
+            }
+          );
+          if (!res.ok) throw new Error("Error al obtener usuario");
+          const userData = await res.json();
+          data[otherUid] = userData;
+        } catch (err) {
+          console.error("Error fetching user:", err);
+        }
+      })
+    );
+    setOtherUsersData(data);
+  };
 
-    fetchOtherUsers();
-  }, [chats, uid]);
+  fetchOtherUsers();
+}, [chats, uid]);
+
 
   return (
     <div

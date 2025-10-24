@@ -19,8 +19,8 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
   const [postData, setPostData] = useState(post);
   const [likes, setLikes] = useState(post.likes || []);
 
-  const hasLiked = currentUser && likes.includes(currentUser.uid);
   const isOwner = currentUser && currentUser.uid === postData.uid;
+  const hasLiked = currentUser && likes.includes(currentUser.uid);
 
   const handleDelete = async () => {
     const result = await Swal.fire({
@@ -48,48 +48,55 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
 
   const handleUpdated = (updatedPost) => {
     setPostData(updatedPost);
+    setLikes(updatedPost.likes || []);
     if (onUpdate) onUpdate();
   };
 
-  const handleLike = () => {
-    if (!currentUser) {
-      Swal.fire("Inicia sesión", "Debes iniciar sesión para dar like", "info");
-      return;
-    }
+ const handleLike = async () => {
+  if (!currentUser) {
+    Swal.fire("Inicia sesión", "Debes iniciar sesión para dar like", "info");
+    return;
+  }
 
-    setLikes((prevLikes) =>
-      prevLikes.includes(currentUser.uid)
-        ? prevLikes.filter((uid) => uid !== currentUser.uid)
-        : [...prevLikes, currentUser.uid]
-    );
+  let updatedLikes;
+  if (hasLiked) {
+    updatedLikes = likes.filter((uid) => uid !== currentUser.uid);
+  } else {
+    updatedLikes = [...likes, currentUser.uid];
+  }
 
-    const updatedLikes = hasLiked
-      ? likes.filter((uid) => uid !== currentUser.uid)
-      : [...likes, currentUser.uid];
+  setLikes(updatedLikes);
 
-    fetch(`/.netlify/functions/updatePostLikes`, {
+  try {
+    await fetch(`/.netlify/functions/updatePostLikes`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+      },
       body: JSON.stringify({
         id: postData._id,
         likes: updatedLikes,
       }),
-    }).catch((err) => console.error("Error actualizando likes:", err));
-  };
+    });
+  } catch (err) {
+    console.error("Error actualizando likes:", err);
+    // revertir en caso de error
+    setLikes(likes);
+  }
+};
 
   return (
     <>
       <div className="post-card">
+        {/* Autor */}
         <div
           className="post-author-info"
           style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
           onClick={() => navigate(`/ver-perfil/${postData.uid}`)}
         >
           <img
-            src={
-              postData.photoURL ||
-              "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            }
+            src={postData.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
             alt={postData.displayName || "Usuario desconocido"}
             className="profile-img"
             style={{
@@ -101,88 +108,54 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
               border: "2px solid #ccc",
             }}
           />
-          <p className="post-author">
-            {postData.displayName || "Usuario desconocido"}
-          </p>
+          <p className="post-author">{postData.displayName || "Usuario desconocido"}</p>
         </div>
 
-        
-        <h2
-          className="post-title"
-          onClick={() => setShowComments(true)}
-          style={{ cursor: "pointer" }}
-        >
+        {/* Título y contenido */}
+        <h2 className="post-title" onClick={() => setShowComments(true)} style={{ cursor: "pointer" }}>
           {postData.title}
         </h2>
-
         <p
           className="post-content"
-          style={{
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-            whiteSpace: "pre-wrap",
-            cursor: "pointer",
-          }}
+          style={{ wordWrap: "break-word", overflowWrap: "break-word", whiteSpace: "pre-wrap", cursor: "pointer" }}
           onClick={() => setShowComments(true)}
         >
           {postData.content}
         </p>
 
+        {/* Fecha */}
         <p className="post-date">
           {new Date(postData.createdAt).toLocaleString()}
           {postData.editado && <span className="post-edited">editado</span>}
         </p>
 
+        {/* Acciones */}
         <div className="post-actions">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLike();
-            }}
+            onClick={(e) => { e.stopPropagation(); handleLike(); }}
             className="btn-like"
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              transition: "transform 0.15s ease",
-            }}
+            style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", transition: "transform 0.15s ease" }}
             onMouseDown={(e) => (e.currentTarget.style.transform = "scale(1.2)")}
             onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            {hasLiked ? (
-              <FaHeart style={{ color: "#b22222", fontSize: "20px" }} />
-            ) : (
-              <FaRegHeart style={{ color: "#b22222", fontSize: "20px" }} />
-            )}
+            {hasLiked ? <FaHeart style={{ color: "#b22222", fontSize: "20px" }} /> : <FaRegHeart style={{ color: "#b22222", fontSize: "20px" }} />}
             <span style={{ color: "#333" }}>{likes.length}</span>
           </button>
 
-          <CrearComentario
-            postId={post._id}
-            onCommentAdded={(newComment) => {}}
-          />
+          <CrearComentario postId={post._id} onCommentAdded={() => {}} />
 
           {isOwner && (
             <>
               <button
                 className="btn btn-vintage"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEdit(true);
-                }}
+                onClick={(e) => { e.stopPropagation(); setShowEdit(true); }}
               >
                 <FiEdit style={{ marginRight: "5px" }} />
                 Editar
               </button>
               <button
                 className="btn btn-vintage"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete();
-                }}
+                onClick={(e) => { e.stopPropagation(); handleDelete(); }}
               >
                 <FiX style={{ marginRight: "5px" }} />
                 Eliminar
@@ -192,20 +165,8 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
         </div>
       </div>
 
-      {showEdit && (
-        <EditPostModal
-          post={postData}
-          onClose={() => setShowEdit(false)}
-          onUpdated={handleUpdated}
-        />
-      )}
-
-      {showComments && (
-        <VerComentarios
-          post={postData}
-          onClose={() => setShowComments(false)}
-        />
-      )}
+      {showEdit && <EditPostModal post={postData} onClose={() => setShowEdit(false)} onUpdated={handleUpdated} />}
+      {showComments && <VerComentarios post={postData} onClose={() => setShowComments(false)} />}
     </>
   );
 };

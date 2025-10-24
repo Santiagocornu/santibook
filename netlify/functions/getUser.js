@@ -2,15 +2,21 @@
 const { MongoClient } = require("mongodb");
 
 exports.handler = async function (event, context) {
-  let client; // Declara el cliente aquí
+  // Revisa la clave enviada en headers
+  const apiKey = event.headers['x-api-key']; // el cliente enviará este header
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: "Unauthorized" }),
+    };
+  }
+
+  let client;
   try {
-    // Crea una nueva conexión por petición
     client = new MongoClient(process.env.MONGO_URI);
-    
     await client.connect();
     const db = client.db("Santibook");
     const collection = db.collection("users");
-
     const users = await collection.find({}).toArray();
 
     return {
@@ -23,9 +29,6 @@ exports.handler = async function (event, context) {
       body: JSON.stringify({ error: error.message }),
     };
   } finally {
-    // Cierra la conexión solo si existe
-    if (client) {
-      await client.close();
-    }
+    if (client) await client.close();
   }
 };

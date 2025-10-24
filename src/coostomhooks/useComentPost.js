@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { auth } from "../db/firebase";
+import Swal from "sweetalert2";
 
 export const useComentPost = () => {
   const [loading, setLoading] = useState(false);
 
   const comentPost = async ({ postId, content }) => {
     const user = auth.currentUser;
-    if (!user) throw new Error("Usuario no autenticado");
+    if (!user) {
+      Swal.fire("Error", "Usuario no autenticado", "error");
+      throw new Error("Usuario no autenticado");
+    }
 
     const commentData = {
       postId,
@@ -18,19 +22,23 @@ export const useComentPost = () => {
 
     try {
       setLoading(true);
+
       const res = await fetch("/.netlify/functions/comentPost", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_API_SECRET_KEY,
+        },
         body: JSON.stringify(commentData),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Error al agregar comentario");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Error al agregar comentario");
 
-      const result = await res.json();
-      return result.comment;
+      return data.comment;
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+      throw err;
     } finally {
       setLoading(false);
     }

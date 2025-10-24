@@ -194,3 +194,10 @@
   box-shadow: 0 0 8px rgba(166, 124, 82, 0.4);
 }
 
+.create-content {
+  background-color: #8e6e53;
+  width: fit-content;   
+  height: fit-content;  
+  padding:50px;        
+  border-radius: 10px;        
+}

@@ -1,34 +1,47 @@
 const { MongoClient, ObjectId } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+const uri = process.env.MONGO_URI;
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  if (!cachedClient) {
+    cachedClient = new MongoClient(uri);
+    await cachedClient.connect();
+  }
+  cachedDb = cachedClient.db("Santibook");
+  return cachedDb;
+}
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "DELETE") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
+  }
+
   try {
-    
     const { id } = event.queryStringParameters || {};
+    if (!id) return { statusCode: 400, body: JSON.stringify({ message: "ID is required" }) };
 
-    if (!id) return { statusCode: 400, body: "ID is required" };
+    const db = await connectToDatabase();
+    const collection = db.collection("post");
 
-    console.log("Deleting post with id:", id);
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { _id: id };
+    const result = await collection.deleteOne(filter);
 
-    await client.connect();
-    const db = client.db("Santibook");
-    const collection = db.collection("post"); 
-
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
-    console.log("Delete result:", result);
-
-    if (result.deletedCount === 0) return { statusCode: 404, body: "Post not found" };
+    if (result.deletedCount === 0) {
+      return { statusCode: 404, body: JSON.stringify({ message: "Post not found" }) };
+    }
 
     return { statusCode: 200, body: JSON.stringify({ message: "Post deleted successfully" }) };
   } catch (error) {
     console.error(error);
-    return { statusCode: 500, body: error.message };
-  } finally {
-    await client.close();
+    return { statusCode: 500, body: JSON.stringify({ message: error.message }) };
   }
 };

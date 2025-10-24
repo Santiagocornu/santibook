@@ -46,7 +46,7 @@ const ProfileCard = ({ user }) => {
 
       <div>
         <h3 style={{ margin: 0 }}>{user.displayName}</h3>
-        <p style={{ margin: 0, color: "#666" }}>{user.bio || ""}</p>
+       
       </div>
     </div>
   );

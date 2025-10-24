@@ -2,7 +2,6 @@ import { MongoClient, ObjectId } from "mongodb";
 
 const uri = process.env.MONGO_URI;
 
-// 🔁 Reusar conexión para no cerrarla en cada request
 let cachedClient = null;
 let cachedDb = null;
 
@@ -14,12 +13,20 @@ async function connectToDatabase() {
     await cachedClient.connect();
   }
 
-  const db = cachedClient.db("Santibook");
-  cachedDb = db;
-  return db;
+  cachedDb = cachedClient.db("Santibook");
+  return cachedDb;
 }
 
 export const handler = async (event) => {
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: "Unauthorized" }),
+    };
+  }
+
   try {
     const { id } = event.queryStringParameters;
     console.log("ID recibido:", id);
@@ -34,11 +41,8 @@ export const handler = async (event) => {
     const db = await connectToDatabase();
     const collection = db.collection("chats");
 
-    // Verificamos que el ID sea válido antes de buscar
     const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { _id: id };
     const chat = await collection.findOne(filter);
-
-    console.log("Resultado de búsqueda:", chat);
 
     if (!chat) {
       return {

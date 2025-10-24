@@ -1,4 +1,3 @@
-// useToggleFollower.js
 import { useState } from "react";
 import Swal from "sweetalert2";
 
@@ -14,20 +13,23 @@ export const useToggleFollower = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("/.netlify/functions/toggleFollower", {  // Cambia la ruta si mantuviste el nombre original
+      const res = await fetch("/.netlify/functions/toggleFollower", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+        },
         body: JSON.stringify({ uid, followerUid }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Error al seguir/dejar de seguir al usuario");
-      }
+      if (!res.ok) throw new Error(data.message || "Error al seguir/dejar de seguir al usuario");
 
-      // Mostrar mensaje basado en la acción
-      const actionMessage = data.isFollowing ? "Ahora sigues a este usuario 🎉" : "Has dejado de seguir a este usuario";
+      const actionMessage = data.isFollowing
+        ? "Ahora sigues a este usuario 🎉"
+        : "Has dejado de seguir a este usuario";
+
       Swal.fire("Éxito", actionMessage, "success");
 
       return { success: true, isFollowing: data.isFollowing };

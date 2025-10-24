@@ -1,10 +1,17 @@
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+let client; // reutilizamos la conexión entre invocaciones
 
 exports.handler = async function (event) {
+  // Validar método
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: "Unauthorized" };
   }
 
   try {
@@ -13,11 +20,16 @@ exports.handler = async function (event) {
       return { statusCode: 400, body: "Falta el parámetro UID" };
     }
 
-    await client.connect();
+    // Crear cliente solo si no existe
+    if (!client) {
+      client = new MongoClient(process.env.MONGO_URI);
+      await client.connect();
+    }
+
     const db = client.db("Santibook");
     const collection = db.collection("posts");
 
-    // Buscar todos los posts del usuario
+    // Buscar posts del usuario
     const posts = await collection.find({ uid }).sort({ createdAt: -1 }).toArray();
 
     return {
@@ -30,7 +42,5 @@ exports.handler = async function (event) {
       statusCode: 500,
       body: JSON.stringify({ message: "Error interno", error: error.message }),
     };
-  } finally {
-    await client.close();
   }
 };

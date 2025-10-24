@@ -1,4 +1,3 @@
-// src/coostomhooks/useGetChatByUid.js
 import { useEffect, useState } from "react";
 
 export const useGetChatByUid = (uid) => {
@@ -10,9 +9,13 @@ export const useGetChatByUid = (uid) => {
     if (!uid) return;
 
     const fetchChats = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const res = await fetch(`/.netlify/functions/getChatByUid?uid=${uid}`);
+        const res = await fetch(`/.netlify/functions/getChatByUid?uid=${encodeURIComponent(uid)}`, {
+          headers: {
+            "x-api-key": process.env.REACT_APP_API_SECRET_KEY,
+          },
+        });
         if (!res.ok) throw new Error("Error fetching chats");
 
         const data = await res.json();

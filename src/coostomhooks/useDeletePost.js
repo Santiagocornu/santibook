@@ -3,16 +3,17 @@ import Swal from "sweetalert2";
 export const useDeletePost = () => {
   const deletePost = async (_id) => {
     try {
-      const idString = _id?.$oid || _id;
+      const idString = _id?._id?.$oid || _id?._id || _id; 
 
       const res = await fetch(`/.netlify/functions/deletePost?id=${idString}`, {
         method: "DELETE",
+        headers: {
+          "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+        },
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Error al eliminar post");
 
       return true;
     } catch (error) {

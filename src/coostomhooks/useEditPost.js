@@ -5,14 +5,15 @@ export const useEditPost = () => {
     try {
       const res = await fetch(`/.netlify/functions/editPost`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+        },
         body: JSON.stringify({ id, title, content, editado }),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Error al actualizar post");
 
       return true;
     } catch (error) {

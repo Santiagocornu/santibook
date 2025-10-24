@@ -1,22 +1,38 @@
-// netlify/functions/createChat.js
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+const uri = process.env.MONGO_URI;
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  if (!cachedClient) {
+    cachedClient = new MongoClient(uri);
+    await cachedClient.connect();
+  }
+  cachedDb = cachedClient.db("Santibook");
+  return cachedDb;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
+  }
+
   try {
     const { uid1, uid2 } = JSON.parse(event.body);
 
     if (!uid1 || !uid2) {
-      return { statusCode: 400, body: "Both user IDs (uid1, uid2) are required" };
+      return { statusCode: 400, body: JSON.stringify({ message: "Both user IDs (uid1, uid2) are required" }) };
     }
 
-    await client.connect();
-    const db = client.db("Santibook");
+    const db = await connectToDatabase();
     const chatsCollection = db.collection("chats");
 
     // Verificar si ya existe un chat entre los dos usuarios
@@ -37,7 +53,7 @@ exports.handler = async (event) => {
     // Crear chat vacío
     const newChat = {
       usuarios: [uid1, uid2],
-      content: [], 
+      content: [],
       createdAt: new Date(),
     };
 
@@ -52,8 +68,6 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error("Error creating chat:", error);
-    return { statusCode: 500, body: error.message };
-  } finally {
-    await client.close();
+    return { statusCode: 500, body: JSON.stringify({ message: error.message }) };
   }
 };

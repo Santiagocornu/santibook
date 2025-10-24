@@ -10,7 +10,11 @@ export const useUserPosts = (uid) => {
 
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`/.netlify/functions/getPostsByUid?uid=${uid}`);
+        const res = await fetch(`/.netlify/functions/getPostsByUid?uid=${uid}`, {
+          headers: {
+            "x-api-key": process.env.REACT_APP_API_SECRET_KEY, // clave de frontend
+          },
+        });
         if (!res.ok) throw new Error("Error al obtener los posts");
         const data = await res.json();
         setPosts(data);

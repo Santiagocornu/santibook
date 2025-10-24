@@ -9,7 +9,7 @@ const SearchPeople = ({ onClose }) => {
   const currentUser = auth.currentUser;
   const uid = currentUser?.uid;
 
-  const { users, loading, error } = useUser(); 
+  const { users, loading, error } = useUser();
   const { createChat } = useCreateChat();
 
   // Filtrado local por displayName (excluye al usuario actual)
@@ -19,8 +19,7 @@ const SearchPeople = ({ onClose }) => {
     if (!term) return users.filter((u) => u.uid !== uid);
     return users.filter(
       (u) =>
-        u.uid !== uid &&
-        u.displayName?.toLowerCase().includes(term) 
+        u.uid !== uid && u.displayName?.toLowerCase().includes(term)
     );
   }, [users, searchTerm, uid]);
 
@@ -32,7 +31,7 @@ const SearchPeople = ({ onClose }) => {
     }
 
     try {
-      await createChat([uid, otherUid]); 
+      await createChat([uid, otherUid]);
       Swal.fire({
         icon: "success",
         title: "Chat creado",
@@ -56,6 +55,9 @@ const SearchPeople = ({ onClose }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
       }}
     >
       <div
@@ -63,20 +65,30 @@ const SearchPeople = ({ onClose }) => {
         onClick={(e) => e.stopPropagation()}
         style={{
           backgroundColor: "#f9f4ef",
-          borderRadius: "12px",
+          borderRadius: "16px",
           padding: "20px",
-          width: "400px",
-          maxHeight: "80vh",
+          width: "420px",
+          maxHeight: "85vh",
           overflowY: "auto",
-          boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <h3 style={{ marginBottom: "15px", textAlign: "center" }}>
-          Buscar usuarios para chatear 
+        <h3
+          style={{
+            marginBottom: "15px",
+            textAlign: "center",
+            color: "#5a4632",
+            fontWeight: "600",
+          }}
+        >
+          Buscar usuarios para chatear
         </h3>
 
         {/* Barra de búsqueda */}
-        <div style={{ display: "flex", marginBottom: "10px" }}>
+        <div style={{ display: "flex", width: "100%", marginBottom: "15px" }}>
           <input
             type="text"
             value={searchTerm}
@@ -84,78 +96,158 @@ const SearchPeople = ({ onClose }) => {
             placeholder="Buscar por nombre..."
             style={{
               flex: 1,
-              padding: "8px",
+              padding: "10px",
               borderRadius: "8px",
               border: "1px solid #ccc",
+              outline: "none",
+              fontSize: "1rem",
             }}
           />
         </div>
 
         {/* Resultados */}
-        {loading ? (
-          <p style={{ textAlign: "center" }}>Cargando usuarios...</p>
-        ) : error ? (
-          <p style={{ textAlign: "center", color: "red" }}>
-            Error al cargar usuarios.
-          </p>
-        ) : filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <div
-              key={user.uid}
-              style={{
-                backgroundColor: "#8e6e53",
-                color: "white",
-                padding: "10px",
-                borderRadius: "8px",
-                marginBottom: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <img
-                  src={
-                    user.photoURL ||
-                    "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-                  }
-                  alt="user"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    backgroundColor: "white",
-                  }}
-                />
-                <div>
-                  <p style={{ margin: 0, fontWeight: "bold" }}>
-                    {user.displayName || "Sin nombre"} 
-                  </p>
-                  <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
-                    {user.email || "Sin email"}
-                  </p>
-                </div>
-              </div>
-              <button
-                className="btn btn-green"
-                onClick={() => handleCreateChat(user.uid)}
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {loading ? (
+            <p style={{ textAlign: "center" }}>Cargando usuarios...</p>
+          ) : error ? (
+            <p style={{ textAlign: "center", color: "red" }}>
+              Error al cargar usuarios.
+            </p>
+          ) : filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <div
+                key={user.uid}
+                style={{
+                  backgroundColor: "#8e6e53",
+                  color: "white",
+                  padding: "12px 16px",
+                  borderRadius: "12px",
+                  marginBottom: "10px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "80px",
+                  boxSizing: "border-box",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.02)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 10px rgba(0,0,0,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               >
-                Chatear
-              </button>
-            </div>
-          ))
-        ) : (
-          <p style={{ textAlign: "center", color: "#8e6e53" }}>
-            {searchTerm
-              ? "No se encontraron usuarios con ese nombre."
-              : "Escribe un nombre para empezar a buscar."}
-          </p>
-        )}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    flex: 1,
+                  }}
+                >
+                  <img
+                    src={
+                      user.photoURL ||
+                      "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                    }
+                    alt="user"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      backgroundColor: "white",
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: "bold",
+                        fontSize: "1rem",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {user.displayName || "Sin nombre"}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.85rem",
+                        opacity: 0.9,
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {user.email || "Sin email"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCreateChat(user.uid);
+                  }}
+                  style={{
+                    backgroundColor: "white",
+                    color: "#8e6e53",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#f1e6d6")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "white")
+                  }
+                >
+                  Chatear
+                </button>
+              </div>
+            ))
+          ) : (
+            <p style={{ textAlign: "center", color: "#8e6e53" }}>
+              {searchTerm
+                ? "No se encontraron usuarios con ese nombre."
+                : "Escribe un nombre para empezar a buscar."}
+            </p>
+          )}
+        </div>
 
         {/* Botón cerrar */}
-        <div style={{ textAlign: "center", marginTop: "15px" }}>
-          <button className="btn btn-red" onClick={onClose}>
+        <div style={{ textAlign: "center", marginTop: "20px", width: "100%" }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: "#8e6e53",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              width: "100%",
+            }}
+          >
             Cerrar
           </button>
         </div>

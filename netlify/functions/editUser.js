@@ -1,10 +1,27 @@
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGO_URI);
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  if (!cachedClient) {
+    cachedClient = new MongoClient(process.env.MONGO_URI);
+    await cachedClient.connect();
+  }
+  cachedDb = cachedClient.db("Santibook");
+  return cachedDb;
+}
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "PUT") {
     return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
+  // Validar API key
+  const apiKey = event.headers['x-api-key'];
+  if (apiKey !== process.env.API_SECRET_KEY) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
   }
 
   try {
@@ -13,15 +30,13 @@ exports.handler = async function (event) {
     if (!uid) return { statusCode: 400, body: "UID is required" };
     if (!displayName) return { statusCode: 400, body: "displayName is required" };
 
-    await client.connect();
-    const db = client.db("Santibook");
+    const db = await connectToDatabase();
     const collection = db.collection("users");
 
     const filter = { uid };
     const userFound = await collection.findOne(filter);
-    if (!userFound) return { statusCode: 404, body: "User not found" };
+    if (!userFound) return { statusCode: 404, body: JSON.stringify({ message: "User not found" }) };
 
-    // Actualizamos con los campos correctos, incluyendo bio
     const result = await collection.updateOne(filter, {
       $set: {
         displayName,
@@ -37,8 +52,6 @@ exports.handler = async function (event) {
     };
   } catch (error) {
     console.error(error);
-    return { statusCode: 500, body: error.message };
-  } finally {
-    await client.close();
+    return { statusCode: 500, body: JSON.stringify({ message: error.message }) };
   }
 };

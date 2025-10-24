@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom"; // Cambia BrowserRouter por MemoryRouter
 import Login from "./components/Login";
 import CrearCuenta from "./components/CrearCuenta";
 import ProtectedRoute from "./ProtectedRoute";
@@ -26,14 +26,14 @@ function App() {
   if (checkingAuth) return <p>Cargando...</p>;
 
   return (
-    <BrowserRouter>
+    <MemoryRouter> 
       <Routes>
-        {/* públicas */}
+        {/* Públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
         <Route path="/login-email" element={<LoginEmail />} />
 
-        {/* protegidas */}
+        {/* Protegidas */}
         <Route
           path="/"
           element={
@@ -74,9 +74,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
       </Routes>
-    </BrowserRouter>
+    </MemoryRouter>
   );
 }
 

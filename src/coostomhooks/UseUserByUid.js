@@ -16,7 +16,11 @@ export const useUserByUid = (uid) => {
       setLoading(true);
       try {
         const encodedUid = encodeURIComponent(uid);
-        const res = await fetch(`/.netlify/functions/getUserByUid?uid=${encodedUid}`);
+        const res = await fetch(`/.netlify/functions/getUserByUid?uid=${encodedUid}`, {
+          headers: {
+            "x-api-key": process.env.REACT_APP_API_SECRET_KEY, 
+          },
+        });
         if (!res.ok) throw new Error("Error al obtener usuario");
         const data = await res.json();
         console.log("Datos del usuario obtenidos:", data);
