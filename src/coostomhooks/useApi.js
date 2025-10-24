@@ -10,9 +10,9 @@ const useApi = () => {
     const headers = {
       "X-API-Key": apiKey, // Envía la clave en headers
       "Content-Type": "application/json",
-      ...options.headers, // Permite sobrescribir headers si es necesario
+      ...options.headers,
     };
-    console.log("API Key enviada:", apiKey);
+    
     return fetch(url, { ...options, headers });
   }, [apiKey]);
 
