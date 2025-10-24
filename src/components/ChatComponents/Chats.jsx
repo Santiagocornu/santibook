@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../../db/firebase";
 import { useGetChatByUid } from "../../coostomhooks/useGetChatByUid";
-import { useUserByUid } from "../../coostomhooks/UseUserByUid";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import "../../styles/globalStyles.css";

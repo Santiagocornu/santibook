@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useChatById } from "../../coostomhooks/useGetChatBy_id";
 import { useUserByUid } from "../../coostomhooks/UseUserByUid";
@@ -31,65 +31,69 @@ const ShowChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchMessages = async (beforeDate = null) => {
-    try {
-      setLoadingMore(true);
-      const url = beforeDate
-        ? `/.netlify/functions/getMessages?id=${_id}&limit=20&beforeDate=${beforeDate}`
-        : `/.netlify/functions/getMessages?id=${_id}&limit=20`;
+  const fetchMessages = useCallback(async (beforeDate = null) => {
+  try {
+    setLoadingMore(true);
+    const url = beforeDate
+      ? `/.netlify/functions/getMessages?id=${_id}&limit=20&beforeDate=${beforeDate}`
+      : `/.netlify/functions/getMessages?id=${_id}&limit=20`;
 
-      const res = await fetch(url, {
-        headers: {
-          "x-api-key": process.env.REACT_APP_API_SECRET_KEY,
-        },
+    const res = await fetch(url, {
+      headers: {
+        "x-api-key": process.env.REACT_APP_API_SECRET_KEY,
+      },
+    });
+    if (!res.ok) throw new Error("Error obteniendo mensajes");
+    const data = await res.json();
+
+    if (beforeDate) {
+      setMessages((prev) => {
+        const existingDates = prev.map((m) => m.date);
+        const uniqueNew = data.filter((m) => !existingDates.includes(m.date));
+        return [...uniqueNew, ...prev].sort(
+          (a, b) => new Date(a.date) - new Date(b.date)
+        );
       });
-      if (!res.ok) throw new Error("Error obteniendo mensajes");
-      const data = await res.json();
-
-      if (beforeDate) {
-        setMessages((prev) => {
-          const existingDates = prev.map((m) => m.date);
-          const uniqueNew = data.filter((m) => !existingDates.includes(m.date));
-          return [...uniqueNew, ...prev].sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-          );
-        });
-        if (data.length === 0) setShowLoadMore(false);
-      } else {
-        setMessages(data);
-        if (data.length > 0) setLastMessageDate(data[data.length - 1].date);
-      }
-    } catch (err) {
-      console.error("Error cargando mensajes:", err);
-    } finally {
-      setLoadingMessages(false);
-      setLoadingMore(false);
+      if (data.length === 0) setShowLoadMore(false);
+    } else {
+      setMessages(data);
+      if (data.length > 0) setLastMessageDate(data[data.length - 1].date);
     }
-  };
+  } catch (err) {
+    console.error("Error cargando mensajes:", err);
+  } finally {
+    setLoadingMessages(false);
+    setLoadingMore(false);
+  }
+}, [_id]);
 
-  const checkNewMessages = async () => {
-    try {
-      const res = await fetch(
-        `/.netlify/functions/checkNewMessages?chatId=${_id}&lastMessageDate=${lastMessageDate}`,
-        { headers: { "x-api-key": process.env.REACT_APP_API_SECRET_KEY } }
-      );
-      if (!res.ok) throw new Error("Error checando mensajes");
-      const newMessages = await res.json();
-      if (newMessages.length > 0) {
-        setMessages((prev) => {
-          const existingDates = prev.map((m) => m.date);
-          const uniqueNew = newMessages.filter((m) => !existingDates.includes(m.date));
-          return [...prev, ...uniqueNew].sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-          );
-        });
-        setLastMessageDate(newMessages[newMessages.length - 1].date);
-        scrollToBottom();
-      }
-    } catch (err) {
-      console.error("Error en polling:", err);
+
+  const checkNewMessages = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `/.netlify/functions/checkNewMessages?chatId=${_id}&lastMessageDate=${lastMessageDate}`,
+      { headers: { "x-api-key": process.env.REACT_APP_API_SECRET_KEY } }
+    );
+    if (!res.ok) throw new Error("Error checando mensajes");
+    const newMessages = await res.json();
+    if (newMessages.length > 0) {
+      setMessages((prev) => {
+        const existingDates = prev.map((m) => m.date);
+        const uniqueNew = newMessages.filter(
+          (m) => !existingDates.includes(m.date)
+        );
+        return [...prev, ...uniqueNew].sort(
+          (a, b) => new Date(a.date) - new Date(b.date)
+        );
+      });
+      setLastMessageDate(newMessages[newMessages.length - 1].date);
+      scrollToBottom();
     }
-  };
+  } catch (err) {
+    console.error("Error en polling:", err);
+  }
+}, [_id, lastMessageDate]);
+
 
   const loadMoreMessages = () => {
     if (messages.length > 0) {
@@ -112,11 +116,12 @@ const ShowChat = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [messages]);
 
-  useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(checkNewMessages, 5000);
-    return () => clearInterval(interval);
-  }, [_id, lastMessageDate]);
+ useEffect(() => {
+  fetchMessages();
+  const interval = setInterval(checkNewMessages, 5000);
+  return () => clearInterval(interval);
+}, [fetchMessages, checkNewMessages]);
+
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || sending) return;

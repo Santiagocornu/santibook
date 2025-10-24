@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaCommentAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useComentPost } from "../coostomhooks/useComentPost";
-import { auth } from "../db/firebase";
 import "../styles/globalStyles.css";
 import "../styles/PostCard.css";
 

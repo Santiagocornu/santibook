@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useApi from './useApi';
 import { auth } from '../db/firebase';
 
@@ -8,7 +8,7 @@ export function usePosts() {
   const [error, setError] = useState(null);
   const { fetchWithAuth } = useApi(); 
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -23,7 +23,7 @@ export function usePosts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchWithAuth]);
 
   const addPost = async (title, content) => {
     try {
@@ -51,7 +51,7 @@ export function usePosts() {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]); 
 
   return { posts, loading, error, addPost, refetch: fetchPosts };
 }
