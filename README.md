@@ -1,6 +1,7 @@
 # Santibook
 
 > 🐦 Red social full-stack con React + Firebase Auth + Mongo Atlas. Permite a los usuarios registrarse, publicar contenido, interactuar con otros y enviar mensajes privados.
+(servidor y front hecho con herramientas gratis. cuando se obtienen los mensajes nuevos es por polling y no por un webhook gracias a carecer de fondos para hostear un server con webhooks.)
 
 ## 📌 Funcionalidades principales
 
