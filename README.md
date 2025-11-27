@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# Santibook
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> 🐦 Red social full-stack con React + Firebase Auth + Mongo Atlas. Permite a los usuarios registrarse, publicar contenido, interactuar con otros y enviar mensajes privados.
 
-## Available Scripts
+## 📌 Funcionalidades principales
 
-In the project directory, you can run:
+### Usuarios
+- **addUser.js**: agrega un nuevo usuario.  
+- **getUser.js / getUserByUid.js**: obtener información de un usuario.  
+- **editUser.js**: editar datos del usuario.  
+- **deleteUser.js**: eliminar un usuario.  
+- **toggleFollower.js**: seguir o dejar de seguir a un usuario.
 
-### `npm start`
+### Posts
+- **addPost.js**: crear un nuevo post.  
+- **getPosts.js / getPostsByUid.js**: obtener todos los posts o por usuario.  
+- **editPost.js**: editar un post existente.  
+- **deletePost.js**: eliminar un post.  
+- **updatePostLikes.js**: actualizar los likes de un post.  
+- **comentPost.js**: comentar un post.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Mensajes / Chat
+- **createChat.js**: iniciar un chat entre usuarios.  
+- **getChatById.js / getChatByUid.js**: obtener un chat específico.  
+- **addMessage.js**: agregar un mensaje a un chat.  
+- **getMessages.js**: listar los mensajes de un chat.  
+- **checkNewMessages.js**: verificar si hay mensajes nuevos.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Tests
+- **test.js**: archivo para probar funciones o endpoints.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🧰 Tecnologías usadas
+- Front-end: React.js  
+- Back-end: Node.js / Express  
+- Base de datos: MongoDB / Mongo Atlas  
+- Autenticación: Firebase Auth  
+- JavaScript ES6+  
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Cómo correr el proyecto localmente
+1. Clonar el repo:
+```bash
+git clone https://github.com/Santiagocornu/santibook.git
+cd santibook
+Instalar dependencias:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+bash
+Copiar código
+npm install
+Configurar credenciales de Firebase y Mongo Atlas.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Levantar el servidor:
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+bash
+Copiar código
+npm start
+Abrir en tu navegador: http://localhost:3000
